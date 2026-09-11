@@ -3,596 +3,1066 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>دفتر المزرعة</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;600&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<title>مزرعتي — إدارة المزرعة المتكاملة</title>
 <style>
 :root{
-  --paper:#F1F4EF; --card:#FFFFFF; --ink:#16211B; --muted:#66756B; --line:#DCE3D9;
-  --crop:#2F6B45; --sheep:#9C6B2A; --smith:#3D5A73; --friend:#7A4E8C;
-  --danger:#B03A2E; --good:#2F6B45; --accent:#1F4D33;
-  --r:10px;
+  --ink:#1f1c19; --ink2:#26231f; --panel:#2a2622; --line:#3b362f;
+  --field:#332f29; --cream:#e8e1d1; --muted:#a49c8c;
+  --gold:#d9a441; --leaf:#3e5138; --green:#7d9a63; --clay:#b9663f; --sky:#6f8fa6;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);
-  font-family:"Tajawal",system-ui,"Segoe UI",sans-serif;font-size:15px;line-height:1.6}
-h1,h2,h3,.disp{font-family:"Reem Kufi","Tajawal",sans-serif;font-weight:600;letter-spacing:0}
-h1{font-size:20px;margin:0}
-h2{font-size:17px;margin:0 0 10px}
-button,input,select{font-family:inherit;font-size:15px}
-.wrap{max-width:760px;margin:0 auto;padding:0 14px 90px}
+body{
+  margin:0; background:var(--ink); color:var(--cream); min-height:100vh;
+  font-family:"Noto Kufi Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
+  font-size:15px; line-height:1.7;
+}
+h2,h3,h4{font-family:Amiri,"Noto Naskh Arabic",Georgia,serif; font-weight:700; margin:0}
+button,input,select,textarea{font-family:inherit; font-size:inherit}
+:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
 
-header{background:var(--accent);color:#EDF3EE;padding:14px 0 0}
-header .wrap{padding-bottom:0}
-.brand{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:12px}
-.brand small{opacity:.75;font-size:13px;display:block;font-weight:400}
-.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tabs button{background:none;border:0;color:#C9DACE;padding:10px 13px;border-radius:8px 8px 0 0;
-  cursor:pointer;white-space:nowrap;font-weight:500}
-.tabs button[aria-current="true"]{background:var(--paper);color:var(--ink)}
-.tabs button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+/* ---------- الشريط العلوي ---------- */
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  padding:14px 22px; background:var(--ink2); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:20}
+.brand{display:flex; flex-direction:column}
+.brand-mark{font-family:Amiri,Georgia,serif; font-size:26px; color:var(--gold); line-height:1.1}
+.brand-sub{font-size:11.5px; color:var(--muted)}
+.tabs{display:flex; gap:4px; flex-wrap:wrap}
+.tab{background:none; border:none; color:var(--cream); padding:8px 14px; border-radius:999px; cursor:pointer; opacity:.75}
+.tab:hover{opacity:1; background:#ffffff0d}
+.tab.on{background:var(--gold); color:#231f1a; font-weight:700; opacity:1}
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0 0 12px}
-.grid{display:grid;gap:10px}
-.g2{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
-.g3{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px}
-.stat .lbl{font-size:13px;color:var(--muted)}
-.stat .num{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
-.pos{color:var(--good)} .neg{color:var(--danger)}
+.page{max-width:1180px; margin:0 auto; padding:26px 20px 70px}
+.sechead{margin:8px 0 22px}
+.eyebrow{color:var(--gold); font-size:13px}
+.sechead h2{font-size:34px; margin:2px 0 6px}
+.sechead p{margin:0; color:var(--muted); max-width:62ch}
 
-label{display:block;font-size:13px;color:var(--muted);margin:0 0 4px}
-input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
-input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
-input[readonly]{background:#F4F6F3;color:var(--muted)}
-.field{margin:0 0 10px}
-.btn{background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:8px;cursor:pointer;font-weight:500}
-.btn:hover{filter:brightness(1.12)}
-.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
-.btn.sm{padding:7px 12px;font-size:13px}
-.btn.danger{background:#fff;color:var(--danger);border:1px solid var(--danger)}
-.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+/* ---------- عناصر ---------- */
+.kindrow{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px}
+.kindchip{background:var(--panel); border:1px solid var(--line); color:var(--cream); padding:9px 14px; border-radius:10px; cursor:pointer}
+.kindchip:hover{border-color:#5c5548}
+.kindchip.on{border-color:var(--gold); background:#d9a4411a; color:var(--gold)}
 
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
-.chip{background:#fff;border:1px solid var(--line);border-radius:20px;padding:7px 14px;cursor:pointer;font-size:14px}
-.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
-.chip:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:18px}
+.panel-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px}
+.panel-head h3{font-size:20px}
+.panel-tag{font-size:12px; color:var(--muted)}
 
-.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
-  padding:10px 0;border-bottom:1px solid var(--line)}
-.row:last-child{border-bottom:0}
-.row .r{text-align:left;white-space:nowrap;direction:ltr;font-variant-numeric:tabular-nums}
-.sub{font-size:12.5px;color:var(--muted)}
-.tag{font-size:11.5px;padding:2px 8px;border-radius:20px;border:1px solid;display:inline-block;vertical-align:2px}
-.t-crop{color:var(--crop);border-color:var(--crop)}
-.t-sheep{color:var(--sheep);border-color:var(--sheep)}
-.t-smith{color:var(--smith);border-color:var(--smith)}
-.t-friend{color:var(--friend);border-color:var(--friend);background:#F6F0F9}
-.empty{text-align:center;color:var(--muted);padding:26px 10px}
+.formgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px}
+.field{display:flex; flex-direction:column; gap:6px}
+.field.wide{grid-column:1/-1}
+.flabel{font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:center}
+.unit{font-style:normal; font-size:11px; color:var(--gold); background:#d9a4411a; padding:1px 7px; border-radius:999px}
+input,select{background:var(--field); border:1px solid var(--line); color:var(--cream); border-radius:9px; padding:10px 12px; width:100%}
+input:hover,select:hover{border-color:#5c5548}
+input[type=date]{color-scheme:dark}
 
-/* شريط التسوية */
-.bal{margin:14px 0 4px}
-.bar{display:flex;height:26px;border-radius:6px;overflow:hidden;background:#EBEFE9;border:1px solid var(--line)}
-.bar i{display:block;transition:width .25s ease}
-.bar .cash{background:var(--crop)} .bar .goods{background:var(--smith)} .bar .debt{background:var(--danger)}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:6px}
-.legend b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
-.dot{width:9px;height:9px;border-radius:2px;display:inline-block;margin-left:5px}
+.hint{margin:14px 0 0; font-size:13.5px; color:var(--muted)}
+.hint b{color:var(--gold)}
+.err{margin:12px 0 0; color:#e08d6c; font-size:13.5px}
+.actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+.btn{border-radius:999px; padding:10px 22px; cursor:pointer; border:1px solid transparent}
+.btn.gold{background:var(--gold); color:#231f1a; font-weight:700}
+.btn.gold:hover{background:#e6b75c}
+.btn.gold:disabled{opacity:.4; cursor:not-allowed}
+.btn.ghost{background:none; border-color:#5c5548; color:var(--cream)}
+.btn.ghost:hover{border-color:var(--cream)}
+.linkbtn{background:none; border:none; color:var(--muted); cursor:pointer; text-decoration:underline; padding:0}
+.linkbtn:hover{color:var(--clay)}
 
-.toast{position:fixed;bottom:16px;right:50%;transform:translateX(50%);background:var(--ink);color:#fff;
-  padding:11px 20px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:9}
-.toast.on{opacity:1}
-.note{background:#F6F0F9;border:1px solid #E2D2EC;color:#5C3A6B;border-radius:8px;padding:9px 12px;font-size:13.5px;margin:0 0 10px}
-.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.empty{text-align:center; padding:26px 10px; color:var(--muted)}
+.empty p{margin:0 0 14px}
+
+.feed{list-style:none; margin:0; padding:0}
+.feed li{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px dashed var(--line); font-size:14px}
+.feed li:first-child{border-top:none}
+.fd{color:var(--muted); font-variant-numeric:tabular-nums; font-size:12.5px}
+.ft{flex:1}
+
+.filters{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:16px}
+.filters .btn{width:100%}
+
+.statstrip{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px}
+.stat{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+.stat .sl{display:block; font-size:12.5px; color:var(--muted)}
+.stat .sv{font-size:23px; font-family:Amiri,Georgia,serif}
+.stat .sv em{font-style:normal; font-size:12px; color:var(--muted)}
+.stat.good{border-inline-start:3px solid var(--green)}
+.stat.warn{border-inline-start:3px solid var(--gold)}
+.stat.bad{border-inline-start:3px solid var(--clay)}
+
+.tablewrap{overflow-x:auto}
+.tbl{width:100%; border-collapse:collapse; font-size:14px; min-width:760px}
+.tbl th{text-align:start; font-weight:600; color:var(--muted); font-size:12.5px; padding:0 10px 10px; border-bottom:1px solid var(--line)}
+.tbl td{padding:11px 10px; border-bottom:1px dashed var(--line); vertical-align:top}
+.tbl tfoot td{border-bottom:none; border-top:1px solid var(--gold); color:var(--gold); font-weight:700}
+.mono{font-variant-numeric:tabular-nums; white-space:nowrap}
+.good{color:var(--green)} .warn{color:var(--gold)} .muted{color:var(--muted)}
+.pill{background:#ffffff0d; border-radius:999px; padding:3px 10px; font-size:12.5px; white-space:nowrap}
+
+.chartgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:16px}
+.chartgrid .panel{margin-bottom:0}
+.cardnote{margin:10px 0 0; font-size:12.5px; color:var(--muted)}
+svg.chart{width:100%; height:auto; display:block}
+.legend{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; font-size:12.5px; color:var(--muted); margin-top:8px}
+.legend i{width:10px; height:10px; border-radius:2px; display:inline-block; margin-inline-end:5px}
+
+.cycleview{display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; padding:18px 0}
+.cnode{width:118px; height:118px; border-radius:50%; border:1px solid var(--gold); background:var(--ink);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center}
+.cnode b{font-size:21px; font-family:Amiri,Georgia,serif; line-height:1.1}
+.cnode em{font-style:normal; font-size:11px; color:var(--gold)}
+.cnode span{font-size:12px; color:var(--muted); margin-top:4px}
+.arrow{color:var(--gold); font-size:20px}
+
+.advgroup{margin-bottom:26px}
+.advhead{font-size:19px; margin-bottom:12px; display:flex; align-items:center; gap:8px}
+.advhead span{font-size:12px; background:#ffffff0d; border-radius:999px; padding:2px 9px; font-family:inherit}
+.advhead.good{color:var(--green)} .advhead.warn{color:var(--gold)} .advhead.bad{color:var(--clay)}
+.advlist{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px}
+.advcard{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px; border-inline-start:3px solid var(--line)}
+.advcard.good{border-inline-start-color:var(--green)}
+.advcard.warn{border-inline-start-color:var(--gold)}
+.advcard.bad{border-inline-start-color:var(--clay)}
+.advcard header{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px}
+.advcard h4{font-size:17px}
+.advtag{font-size:11.5px; color:var(--muted); white-space:nowrap}
+.advcard p{margin:0; font-size:14px}
+.evidence{margin-top:8px; font-size:12.5px; color:var(--gold); font-variant-numeric:tabular-nums}
+
+.panel.next{background:var(--leaf); border-color:#50654733}
+.nextlist{margin:0; padding-inline-start:20px}
+.nextlist li{margin-bottom:8px}
+.nextlist b{color:var(--gold)}
+
+.modal{position:fixed; inset:0; background:#000000b8; display:flex; align-items:center; justify-content:center; padding:20px; z-index:50}
+.modal[hidden]{display:none}
+.modalbox{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; max-width:680px; width:100%}
+.modalbox h3{font-size:20px; margin-bottom:6px}
+.modalbox textarea{width:100%; height:220px; margin-top:12px; background:var(--field); color:var(--cream);
+  border:1px solid var(--line); border-radius:9px; padding:12px; direction:ltr; text-align:left; font-size:12.5px}
+
+.toast{position:fixed; inset-inline-start:50%; transform:translateX(-50%); bottom:24px;
+  background:var(--gold); color:#231f1a; font-weight:700; padding:10px 22px; border-radius:999px; z-index:60}
+.toast[hidden]{display:none}
+
+@media (max-width:640px){
+  .sechead h2{font-size:27px}
+  .page{padding:20px 14px 60px}
+  .topbar{padding:12px 14px}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap">
-    <div class="brand">
-      <div><h1>دفتر المزرعة</h1><small>المحصول · النعيمي · الحدادة</small></div>
-      <button class="btn ghost sm" id="exportBtn">حفظ نسخة</button>
-    </div>
-    <nav class="tabs" id="tabs"></nav>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">مزرعتي</span>
+    <span class="brand-sub">نباتات · أغنام نعيمي · استدامة</span>
   </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-tab="entry">إدخال البيانات</button>
+    <button class="tab" data-tab="reports">التقارير</button>
+    <button class="tab" data-tab="analysis">التحليل</button>
+    <button class="tab" data-tab="advice">الاقتراحات</button>
+  </nav>
 </header>
 
-<main class="wrap" id="view"></main>
-<div class="toast" id="toast"></div>
+<main class="page" id="page"></main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modalbox">
+    <h3 id="modalTitle"></h3>
+    <p class="muted" id="modalNote"></p>
+    <textarea id="modalText"></textarea>
+    <div class="actions">
+      <button class="btn gold" data-act="modal-close">إغلاق</button>
+      <button class="btn ghost" data-act="modal-import" id="importBtn" hidden>استيراد البيانات</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
 
 <script>
-const SEC = {crop:{n:'المحصول',c:'t-crop'}, sheep:{n:'النعيمي',c:'t-sheep'}, smith:{n:'الحدادة',c:'t-smith'}};
-const uid = () => Math.random().toString(36).slice(2,9);
-const n = v => Math.round((Number(v)||0)*100)/100;
-const fmt = v => (Number(v)||0).toLocaleString('en-US',{maximumFractionDigits:2});
-const today = () => new Date().toISOString().slice(0,10);
-const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* ============================================================
+   مزرعتي — تطبيق إدارة المزرعة المتكاملة
+   HTML + JavaScript فقط، بدون أي مكتبات خارجية.
+   ============================================================ */
 
-let S = {products:[],people:[],moves:[]};
-let ui = {tab:'home', form:'sale', person:null};
+var STORE_KEY = "mazraati_records_v1";
+var SAR = "ر.س";
 
-/* ---------- التخزين ---------- */
-async function save(){
-  try{ await window.storage.set('farm-ledger', JSON.stringify(S)); }
-  catch(e){ /* يشتغل من الذاكرة إذا التخزين غير متاح */ }
+var ZONES_PLANT = ["بيت زجاجي 1", "بيت زجاجي 2", "بيت زجاجي 3", "المشتل الخارجي"];
+var ZONES_ALL = ZONES_PLANT.concat(["المراعي", "حظائر الأغنام", "منطقة التسميد", "بركة التجميع"]);
+
+var OPS = {
+  "تجهيز": { unit: "كجم سماد", hint: "تحضير التربة والأسمدة العضوية المناسبة لكل محصول." },
+  "ريّ":   { unit: "م³ مياه",  hint: "ريّ منتظم حسب احتياج كل نوع نبات." },
+  "صيانة": { unit: "ساعة عمل", hint: "إزالة الأعشاب والآفات دون مبيدات ضارة." },
+  "حصاد":  { unit: "نبتة",     hint: "جمع الشتلات والنباتات الجاهزة للبيع." }
+};
+var FLOCK = {
+  "تغذية": { unit: "كجم علف",   hint: "علف عالي الجودة ومياه نظيفة يومياً." },
+  "صحة":   { unit: "رأس معالج", hint: "فحوصات دورية وتطعيمات للوقاية." },
+  "تكاثر": { unit: "مولود",     hint: "برنامج تحسين وراثي منظم." },
+  "رعاية": { unit: "ساعة عمل",  hint: "مأوى آمن ونظافة الحظائر." }
+};
+var RESOURCES = {
+  "روث مجمّع": { unit: "كجم" },
+  "سماد عضوي منتج": { unit: "كجم" },
+  "غاز حيوي": { unit: "م³" },
+  "مياه معاد تدويرها": { unit: "م³" }
+};
+var PRODUCTS = ["شتلات", "نباتات زينة", "لحوم", "ألبان", "سماد عضوي"];
+var CHANNELS = ["مشاتل التجزئة", "أفراد من المزرعة", "السوق المحلي", "موزّع بشراكة"];
+var EXP_CATS = ["أعلاف", "بذور وشتلات", "رعاية بيطرية", "طاقة", "مياه", "صيانة", "عمالة", "تسويق", "أخرى"];
+var SECTIONS = ["قسم النباتات", "قسم الأغنام", "مشترك"];
+
+var KINDS = {
+  plants: { label:"إنتاج المشاتل", icon:"🌱", section:"قسم النباتات", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"zone", l:"الموقع", t:"select", o:ZONES_PLANT},
+    {n:"item", l:"الصنف", t:"select", o:["شتلات موسمية","شتلات دائمة","نباتات زينة داخلية","نباتات زينة خارجية"]},
+    {n:"qty", l:"الكمية", t:"number", u:"شتلة"},
+    {n:"cost", l:"التكلفة", t:"number", u:SAR},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  ops: { label:"عملية زراعية", icon:"🚿", section:"قسم النباتات", drive:"opType", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"opType", l:"نوع العملية", t:"select", o:Object.keys(OPS)},
+    {n:"zone", l:"الموقع", t:"select", o:ZONES_ALL},
+    {n:"qty", l:"المقدار", t:"number", dyn:function(r){ return (OPS[r.opType]||{}).unit || "وحدة"; }},
+    {n:"cost", l:"التكلفة", t:"number", u:SAR},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  flock: { label:"سجل الأغنام", icon:"🐑", section:"قسم الأغنام", drive:"category", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"category", l:"نوع السجل", t:"select", o:Object.keys(FLOCK)},
+    {n:"head", l:"عدد الرؤوس", t:"number", u:"رأس"},
+    {n:"qty", l:"المقدار", t:"number", dyn:function(r){ return (FLOCK[r.category]||{}).unit || "وحدة"; }},
+    {n:"cost", l:"التكلفة", t:"number", u:SAR},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  sales: { label:"مبيعات", icon:"📈", section:"مشترك", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"product", l:"المنتج", t:"select", o:PRODUCTS},
+    {n:"channel", l:"قناة البيع", t:"select", o:CHANNELS},
+    {n:"qty", l:"الكمية", t:"number", u:"وحدة"},
+    {n:"price", l:"سعر الوحدة", t:"number", u:SAR},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  cycle: { label:"دورة الموارد", icon:"♻️", section:"الاستدامة", drive:"resource", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"resource", l:"المورد", t:"select", o:Object.keys(RESOURCES)},
+    {n:"qty", l:"المقدار", t:"number", dyn:function(r){ return (RESOURCES[r.resource]||{}).unit || "وحدة"; }},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  expense: { label:"مصروف", icon:"🧾", section:"مشترك", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"category", l:"بند المصروف", t:"select", o:EXP_CATS},
+    {n:"section", l:"القسم", t:"select", o:SECTIONS},
+    {n:"cost", l:"المبلغ", t:"number", u:SAR},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]}
+};
+
+/* ---------- أدوات ---------- */
+var NF = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+function num(v){ v = parseFloat(v); return isFinite(v) ? v : 0; }
+function fmt(v){ return NF.format(num(v)); }
+function money(v){ return NF.format(Math.round(num(v))); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function monthOf(d){ return (d||"").slice(0,7); }
+function daysSince(d){ return (Date.now() - new Date(d).getTime()) / 86400000; }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+function revenueOf(r){ return r.kind === "sales" ? num(r.qty) * num(r.price) : 0; }
+function costOf(r){ return r.kind === "sales" ? 0 : num(r.cost); }
+function unitOf(rec, f){ return f.dyn ? f.dyn(rec) : (f.u || ""); }
+
+/* ---------- الحالة والتخزين ---------- */
+var state = {
+  tab: "entry",
+  records: [],
+  kind: "plants",
+  filters: { kind:"all", from:"", to:"", q:"" }
+};
+
+function save(){
+  if (!window.storage) return;
+  try { window.storage.set(STORE_KEY, JSON.stringify(state.records)); } catch(e){}
 }
-async function load(){
-  try{
-    const r = await window.storage.get('farm-ledger');
-    if(r && r.value){ S = JSON.parse(r.value); return; }
-  }catch(e){}
-  seed();
-}
-function seed(){
-  const p=(name,sec,unit,price,extra={})=>({id:uid(),name,sec,unit,price,mine:true,...extra});
-  S.products=[
-    p('شتلة زيتون','crop','شتلة',25),
-    p('برسيم (علف)','crop','كيلو',3),
-    p('سماد ديدان','crop','كيلو',8),
-    p('خروف نعيمي','sheep','رأس',1400),
-    p('محراث','smith','حبة',400),
-    p('مضخة (بضاعة أمانة)','smith','حبة',900,{mine:false,owner:'أبو ماجد',comm:10}),
-  ];
-  S.people=[
-    {id:uid(),name:'سالم الحربي',phone:'',friend:true},
-    {id:uid(),name:'مشتري السوق',phone:'',friend:false},
-  ];
-  S.moves=[];
+function load(cb){
+  if (!window.storage) { cb(); return; }
+  try {
+    window.storage.get(STORE_KEY).then(function(res){
+      if (res && res.value) { try { state.records = JSON.parse(res.value) || []; } catch(e){} }
+      cb();
+    })["catch"](function(){ cb(); });
+  } catch(e){ cb(); }
 }
 
-/* ---------- الحسابات ---------- */
-const prod = id => S.products.find(p=>p.id===id);
-const pers = id => S.people.find(p=>p.id===id);
+function addRecord(rec){ state.records.unshift(rec); save(); }
+function delRecord(id){
+  state.records = state.records.filter(function(r){ return r.id !== id; });
+  save(); render(); toast("تم حذف السجل");
+}
 
-function stock(pid){
-  let q=0;
-  for(const m of S.moves){
-    if(m.productId===pid){
-      if(['production','purchase'].includes(m.type)) q+=m.qty;
-      if(['sale','gift','transfer','loss','consume'].includes(m.type)) q-=m.qty;
-    }
-    if(m.type==='sale' && m.goodsProductId===pid) q+=n(m.goodsQty);
+var toastTimer = null;
+function toast(msg){
+  var el = document.getElementById("toast");
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.hidden = true; }, 2600);
+}
+
+/* ---------- وصف السجل ---------- */
+function describe(r){
+  function u(name){
+    var fd = null, fs = KINDS[r.kind].fields, i;
+    for (i=0;i<fs.length;i++) if (fs[i].n === name) fd = fs[i];
+    return fd ? unitOf(r, fd) : "";
   }
-  return n(q);
-}
-function cashBox(){
-  let c=0;
-  for(const m of S.moves){
-    if(m.type==='sale') c+=n(m.cash);
-    if(m.type==='payment') c+=n(m.amount);
-    if(m.type==='purchase'||m.type==='expense') c-=n(m.cash);
+  switch(r.kind){
+    case "plants":  return r.item + " — " + fmt(r.qty) + " شتلة في " + r.zone;
+    case "ops":     return r.opType + " — " + fmt(r.qty) + " " + u("qty") + " في " + r.zone;
+    case "flock":   return r.category + " — " + fmt(r.qty) + " " + u("qty") + " لـ " + fmt(r.head) + " رأس";
+    case "sales":   return "بيع " + r.product + " — " + fmt(r.qty) + " وحدة عبر " + r.channel + " بقيمة " + money(revenueOf(r)) + " " + SAR;
+    case "cycle":   return r.resource + " — " + fmt(r.qty) + " " + u("qty");
+    case "expense": return r.category + " (" + r.section + ") — " + money(r.cost) + " " + SAR;
   }
-  return n(c);
+  return "";
 }
-function debtOf(pid){
-  let d=0;
-  for(const m of S.moves){
-    if(m.personId!==pid) continue;
-    if(m.type==='sale') d+=n(m.debt);
-    if(m.type==='payment') d-=n(m.amount);
+
+/* ============================================================
+   محرّك التحليل
+   ============================================================ */
+function analyze(recs){
+  var rev = 0, cost = 0, months = {}, i;
+  for (i=0;i<recs.length;i++){ rev += revenueOf(recs[i]); cost += costOf(recs[i]); }
+
+  recs.forEach(function(r){
+    var m = monthOf(r.date); if (!m) return;
+    if (!months[m]) months[m] = { m:m, rev:0, cost:0, water:0, recycled:0 };
+    months[m].rev += revenueOf(r);
+    months[m].cost += costOf(r);
+    if (r.kind === "ops" && r.opType === "ريّ") months[m].water += num(r.qty);
+    if (r.kind === "cycle" && r.resource === "مياه معاد تدويرها") months[m].recycled += num(r.qty);
+  });
+  var monthly = Object.keys(months).sort().slice(-12).map(function(k){
+    var x = months[k];
+    return { m:x.m.slice(5) + "/" + x.m.slice(2,4), rev:Math.round(x.rev), cost:Math.round(x.cost), water:Math.round(x.water), recycled:Math.round(x.recycled) };
+  });
+
+  var zoneMap = {};
+  recs.filter(function(r){ return r.kind === "plants"; }).forEach(function(r){
+    zoneMap[r.zone] = (zoneMap[r.zone]||0) + num(r.qty);
+  });
+  var byZone = Object.keys(zoneMap).map(function(k){ return { name:k, value:zoneMap[k] }; })
+    .sort(function(a,b){ return b.value - a.value; });
+
+  var chMap = {};
+  recs.filter(function(r){ return r.kind === "sales"; }).forEach(function(r){
+    chMap[r.channel] = (chMap[r.channel]||0) + revenueOf(r);
+  });
+  var byChannel = Object.keys(chMap).map(function(k){ return { name:k, value:Math.round(chMap[k]) }; })
+    .sort(function(a,b){ return b.value - a.value; });
+
+  var secMap = { "قسم النباتات":0, "قسم الأغنام":0, "مشترك":0 };
+  recs.forEach(function(r){
+    var c = costOf(r); if (!c) return;
+    var sec = r.kind === "expense" ? (r.section || "مشترك") : KINDS[r.kind].section;
+    if (sec === "الاستدامة") sec = "مشترك";
+    secMap[sec] = (secMap[sec]||0) + c;
+  });
+  var bySection = Object.keys(secMap).map(function(k){ return { name:k, value:Math.round(secMap[k]) }; });
+
+  function sumCycle(res){
+    return recs.filter(function(r){ return r.kind === "cycle" && r.resource === res; })
+               .reduce(function(s,r){ return s + num(r.qty); }, 0);
   }
-  return n(d);
-}
-const totalDebt = () => n(S.people.reduce((s,p)=>s+Math.max(0,debtOf(p.id)),0));
-
-function giftValue(m){ const p=prod(m.productId); return p? n(m.qty*p.price):0; }
-function discountOf(m){
-  const p=prod(m.productId); if(!p||m.type!=='sale') return 0;
-  return n(Math.max(0,(p.price-m.price)*m.qty));
-}
-const totalGifts = () => n(S.moves.filter(m=>m.type==='gift').reduce((s,m)=>s+giftValue(m),0));
-const totalDisc  = () => n(S.moves.reduce((s,m)=>s+discountOf(m),0));
-
-function owedToOwners(){
-  let v=0;
-  for(const m of S.moves){
-    if(m.type!=='sale') continue;
-    const p=prod(m.productId);
-    if(p && !p.mine) v += n(m.total*(1-(p.comm||0)/100));
+  function sumOps(t){
+    return recs.filter(function(r){ return r.kind === "ops" && r.opType === t; })
+               .reduce(function(s,r){ return s + num(r.qty); }, 0);
   }
-  return n(v);
+  var manure = sumCycle("روث مجمّع"), compost = sumCycle("سماد عضوي منتج");
+  var biogas = sumCycle("غاز حيوي"), recycledWater = sumCycle("مياه معاد تدويرها");
+  var water = sumOps("ريّ"), fertUsed = sumOps("تجهيز"), harvested = sumOps("حصاد");
+  var plantsQty = recs.filter(function(r){ return r.kind === "plants"; }).reduce(function(s,r){ return s + num(r.qty); }, 0);
+  var soldPlants = recs.filter(function(r){ return r.kind === "sales" && (r.product === "شتلات" || r.product === "نباتات زينة"); })
+                       .reduce(function(s,r){ return s + num(r.qty); }, 0);
+
+  return {
+    rev:rev, cost:cost, net:rev-cost, monthly:monthly, byZone:byZone, byChannel:byChannel, bySection:bySection,
+    manure:manure, compost:compost, biogas:biogas, recycledWater:recycledWater,
+    water:water, fertUsed:fertUsed, harvested:harvested, plantsQty:plantsQty, soldPlants:soldPlants,
+    recycleRate: water ? (recycledWater/water)*100 : 0,
+    convRate: manure ? (compost/manure)*100 : 0,
+    compostCover: fertUsed ? Math.min(999,(compost/fertUsed)*100) : 0
+  };
 }
-function sectionReport(sec){
-  let sales=0,exp=0,inGoods=0,outGoods=0,gifts=0,disc=0;
-  for(const m of S.moves){
-    const p = m.productId? prod(m.productId):null;
-    if(m.type==='sale' && p && p.sec===sec) { sales+=n(m.total); disc+=discountOf(m); }
-    if(m.type==='gift' && p && p.sec===sec) gifts+=giftValue(m);
-    if(m.type==='expense' && m.sec===sec) exp+=n(m.amount);
-    if(m.type==='purchase' && p && p.sec===sec) exp+=n(m.total);
-    if(m.type==='transfer' && p){
-      const val=n(m.qty*p.price);
-      if(m.toSec===sec) inGoods+=val;
-      if(p.sec===sec) outGoods+=val;
-    }
+
+/* ============================================================
+   رسوم SVG مكتوبة يدوياً (بدون مكتبات)
+   ============================================================ */
+var W = 480, H = 250, PL = 12, PR = 52, PT = 14, PB = 30;
+function niceMax(v){
+  if (!(v>0)) return 10;
+  var p = Math.pow(10, Math.floor(Math.log10(v))), n = v/p;
+  var m = n<=1?1:n<=2?2:n<=5?5:10;
+  return m*p;
+}
+function svgOpen(){ return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" role="img">'; }
+function gridY(max){
+  var out = "", i, y, v;
+  for (i=0;i<=4;i++){
+    y = PT + (H-PT-PB) * (i/4);
+    v = max - max*(i/4);
+    out += '<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="#3a3630" stroke-dasharray="3 3"/>';
+    out += '<text x="'+(W-PR+6)+'" y="'+(y+4)+'" fill="#a49c8c" font-size="10">'+NF.format(Math.round(v))+'</text>';
   }
-  return {sales:n(sales),exp:n(exp),inGoods:n(inGoods),outGoods:n(outGoods),
-          gifts:n(gifts),disc:n(disc),net:n(sales+outGoods-exp-inGoods)};
+  return out;
 }
-function netResult(){
-  let rev=0,cost=0;
-  for(const m of S.moves){
-    if(m.type==='sale') rev+=n(m.total);
-    if(m.type==='expense') cost+=n(m.amount);
-    if(m.type==='purchase') cost+=n(m.total);
-  }
-  return n(rev-cost);
-}
-
-/* ---------- أدوات العرض ---------- */
-function tag(sec){ return `<span class="tag ${SEC[sec].c}">${SEC[sec].n}</span>`; }
-function opts(list, val, label){ return list.map(x=>`<option value="${x.id}" ${x.id===val?'selected':''}>${esc(label(x))}</option>`).join(''); }
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1900); }
-function moveLabel(m){
-  const p = m.productId? prod(m.productId):null;
-  const who = m.personId? pers(m.personId):null;
-  const nm = p? p.name : (m.sec? SEC[m.sec].n : '');
-  switch(m.type){
-    case 'sale': return `بيع · ${esc(nm)} · ${fmt(m.qty)} ${esc(p?.unit||'')}${who?' · '+esc(who.name):''}`;
-    case 'gift': return `هدية · ${esc(nm)} · ${fmt(m.qty)} ${esc(p?.unit||'')}${who?' · '+esc(who.name):''}`;
-    case 'production': return `إنتاج · ${esc(nm)} · ${fmt(m.qty)}`;
-    case 'purchase': return `شراء · ${esc(nm)} · ${fmt(m.qty)}`;
-    case 'expense': return `مصروف · ${esc(nm)}${m.note?' · '+esc(m.note):''}`;
-    case 'transfer': return `تحويل · ${esc(nm)} · ${fmt(m.qty)} ← ${SEC[m.toSec].n}`;
-    case 'loss': return `نفوق/تلف · ${esc(nm)} · ${fmt(m.qty)}`;
-    case 'consume': return `استهلاك بيت · ${esc(nm)} · ${fmt(m.qty)}`;
-    case 'payment': return `سداد دين · ${esc(who?.name||'')}`;
-  }
-}
-function moveAmount(m){
-  if(m.type==='sale') return `<span class="pos">+${fmt(m.total)}</span><div class="sub">${m.debt>0?'باقي '+fmt(m.debt):'مسدد'}${m.goods>0?' · بضاعة '+fmt(m.goods):''}</div>`;
-  if(m.type==='gift') return `<span class="sub">ببلاش · قيمة ${fmt(giftValue(m))}</span>`;
-  if(m.type==='payment') return `<span class="pos">+${fmt(m.amount)}</span>`;
-  if(m.type==='expense'||m.type==='purchase') return `<span class="neg">−${fmt(m.amount||m.total)}</span>`;
-  return `<span class="sub">حركة مخزون</span>`;
-}
-
-/* ---------- الشاشات ---------- */
-const TABS=[['home','الرئيسية'],['new','تسجيل حركة'],['stock','المخزون'],['people','العملاء'],['reports','التقارير'],['setup','الإعداد']];
-
-function viewHome(){
-  const net=netResult();
-  const last=[...S.moves].slice(-8).reverse();
-  return `
-  <div class="grid g2" style="margin:14px 0 12px">
-    <div class="stat"><div class="lbl">الصندوق</div><div class="num">${fmt(cashBox())}</div></div>
-    <div class="stat"><div class="lbl">لك عند الناس</div><div class="num ${totalDebt()>0?'neg':''}">${fmt(totalDebt())}</div></div>
-    <div class="stat"><div class="lbl">النتيجة</div><div class="num ${net>=0?'pos':'neg'}">${net>=0?'+':'−'}${fmt(Math.abs(net))}</div></div>
-    <div class="stat"><div class="lbl">هدايا وخصومات</div><div class="num">${fmt(totalGifts()+totalDisc())}</div></div>
-  </div>
-  ${owedToOwners()>0?`<div class="note">مستحق لأصحاب البضاعة الأمانة: <b>${fmt(owedToOwners())}</b> — هذي فلوس في صندوقك لكنها مو لك.</div>`:''}
-  <div class="card">
-    <h2>الأقسام</h2>
-    ${Object.keys(SEC).map(k=>{const r=sectionReport(k);return `
-      <div class="row"><div>${tag(k)}<div class="sub">بيع ${fmt(r.sales)} · مصاريف ${fmt(r.exp)}</div></div>
-      <div class="r ${r.net>=0?'pos':'neg'}">${r.net>=0?'+':'−'}${fmt(Math.abs(r.net))}</div></div>`}).join('')}
-  </div>
-  <div class="card">
-    <h2>آخر الحركات</h2>
-    ${last.length? last.map(m=>`<div class="row"><div>${moveLabel(m)}<div class="sub">${m.date}</div></div><div class="r">${moveAmount(m)}</div></div>`).join('')
-      : '<div class="empty">ما في حركات بعد. ابدأ من «تسجيل حركة».</div>'}
-  </div>`;
-}
-
-const FORMS=[['sale','بيع'],['gift','هدية'],['production','إنتاج'],['purchase','شراء'],
-             ['expense','مصروف'],['transfer','تحويل'],['loss','نفوق/تلف'],['consume','استهلاك'],['payment','سداد دين']];
-
-function viewNew(){
-  const chips = FORMS.map(([k,l])=>`<button class="chip" aria-pressed="${ui.form===k}" data-form="${k}">${l}</button>`).join('');
-  return `<div style="margin:14px 0 0"><div class="chips">${chips}</div><div class="card" id="formBox">${formHTML()}</div></div>`;
-}
-
-function pSel(id,filter){ 
-  const list=S.products.filter(filter||(()=>true));
-  return list.length? `<select id="${id}">${opts(list,null,x=>`${x.name} (${SEC[x.sec].n})`)}</select>` 
-                    : `<select id="${id}" disabled><option>لا يوجد أصناف</option></select>`;
-}
-function peopleSel(id){ return `<select id="${id}">${opts(S.people,null,x=>x.name+(x.friend?' — صديق':''))}</select>`; }
-
-function formHTML(){
-  const f=ui.form;
-  const qty=(l='الكمية')=>`<div class="field"><label>${l}</label><input id="qty" type="number" step="any" min="0" value="1"></div>`;
-  const date=`<div class="field"><label>التاريخ</label><input id="date" type="date" value="${today()}"></div>`;
-
-  if(f==='sale') return `
-    <h2>تسجيل بيع</h2>
-    <div class="grid g2">
-      <div class="field"><label>العميل</label>${peopleSel('person')}</div>
-      <div class="field"><label>الصنف</label>${pSel('product')}</div>
-    </div>
-    <div class="grid g2">${qty()}<div class="field"><label>سعر الوحدة</label><input id="price" type="number" step="any" min="0"></div></div>
-    <div id="friendNote"></div>
-    <div class="grid g3">
-      <div class="field"><label>الإجمالي</label><input id="total" readonly></div>
-      <div class="field"><label>نقد مستلم</label><input id="cash" type="number" step="any" min="0" value="0"></div>
-      <div class="field"><label>قيمة بضاعة</label><input id="goods" type="number" step="any" min="0" value="0"></div>
-    </div>
-    <div id="goodsBox"></div>
-    <div class="bal">
-      <div class="bar"><i class="cash" id="bCash"></i><i class="goods" id="bGoods"></i><i class="debt" id="bDebt"></i></div>
-      <div class="legend">
-        <span><i class="dot" style="background:var(--crop)"></i>نقد <b id="lCash">0</b></span>
-        <span><i class="dot" style="background:var(--smith)"></i>بضاعة <b id="lGoods">0</b></span>
-        <span><i class="dot" style="background:var(--danger)"></i>دين <b id="lDebt">0</b></span>
-      </div>
-      <p class="hint">الباقي يتحسب وحده ويتسجل دين على العميل.</p>
-    </div>
-    ${date}<button class="btn" id="submit">حفظ البيع</button>`;
-
-  if(f==='gift') return `
-    <h2>هدية لصديق</h2>
-    <p class="hint" style="margin-bottom:12px">تنقص من المخزن، ما تدخل الصندوق، وقيمتها تنسجل باسمه.</p>
-    <div class="grid g2"><div class="field"><label>الشخص</label>${peopleSel('person')}</div>
-    <div class="field"><label>الصنف</label>${pSel('product')}</div></div>
-    ${qty()}${date}<button class="btn" id="submit">حفظ الهدية</button>`;
-
-  if(f==='production') return `
-    <h2>إنتاج أو حصاد</h2>
-    <div class="field"><label>الصنف</label>${pSel('product')}</div>
-    ${qty()}${date}<button class="btn" id="submit">إضافة للمخزن</button>`;
-
-  if(f==='purchase') return `
-    <h2>شراء</h2>
-    <div class="field"><label>الصنف</label>${pSel('product')}</div>
-    <div class="grid g2">${qty()}<div class="field"><label>التكلفة الإجمالية</label><input id="total" type="number" step="any" min="0" value="0"></div></div>
-    <div class="field"><label>المدفوع نقداً</label><input id="cash" type="number" step="any" min="0" value="0"></div>
-    ${date}<button class="btn" id="submit">حفظ الشراء</button>`;
-
-  if(f==='expense') return `
-    <h2>مصروف</h2>
-    <div class="grid g2">
-      <div class="field"><label>القسم</label><select id="sec">${Object.keys(SEC).map(k=>`<option value="${k}">${SEC[k].n}</option>`).join('')}</select></div>
-      <div class="field"><label>المبلغ</label><input id="amount" type="number" step="any" min="0" value="0"></div>
-    </div>
-    <div class="field"><label>على وش؟</label><input id="note" placeholder="علف، ماء، عمالة، دواء..."></div>
-    ${date}<button class="btn" id="submit">حفظ المصروف</button>`;
-
-  if(f==='transfer') return `
-    <h2>تحويل داخلي</h2>
-    <p class="hint" style="margin-bottom:12px">مثل: علف من المحصول للنعيمي. ما هو بيع — ينقص مخزون قسم ويتحسب تكلفة على القسم الثاني.</p>
-    <div class="grid g2">
-      <div class="field"><label>الصنف</label>${pSel('product')}</div>
-      <div class="field"><label>إلى قسم</label><select id="toSec">${Object.keys(SEC).map(k=>`<option value="${k}">${SEC[k].n}</option>`).join('')}</select></div>
-    </div>
-    ${qty()}${date}<button class="btn" id="submit">حفظ التحويل</button>`;
-
-  if(f==='loss'||f==='consume') return `
-    <h2>${f==='loss'?'نفوق أو تلف':'استهلاك البيت'}</h2>
-    <div class="field"><label>الصنف</label>${pSel('product')}</div>
-    ${qty()}${date}<button class="btn" id="submit">حفظ</button>`;
-
-  if(f==='payment') return `
-    <h2>سداد دين</h2>
-    <div class="field"><label>العميل</label>${peopleSel('person')}</div>
-    <div class="field"><label>المبلغ المستلم</label><input id="amount" type="number" step="any" min="0" value="0"></div>
-    ${date}<button class="btn" id="submit">حفظ السداد</button>`;
-}
-
-function viewStock(){
-  const rows=S.products.map(p=>{
-    const q=stock(p.id);
-    return `<div class="row"><div>${esc(p.name)} ${tag(p.sec)} ${!p.mine?'<span class="tag t-friend">أمانة</span>':''}
-      <div class="sub">${p.mine?'سعرك المرجعي '+fmt(p.price):'لـ'+esc(p.owner||'')+' · عمولتك '+(p.comm||0)+'%'}</div></div>
-      <div class="r"><b>${fmt(q)}</b> ${esc(p.unit)}<div class="sub">${p.mine?'قيمة '+fmt(q*p.price):'مو ملكك'}</div></div></div>`;
-  }).join('');
-  const val=n(S.products.filter(p=>p.mine).reduce((s,p)=>s+stock(p.id)*p.price,0));
-  return `<div class="card" style="margin-top:14px"><h2>المخزون الحالي</h2>
-    ${S.products.length?rows:'<div class="empty">أضف أصنافك من «الإعداد».</div>'}
-    <div class="row" style="border-top:2px solid var(--line);margin-top:6px;padding-top:12px">
-      <div><b>قيمة مخزونك</b><div class="sub">بضاعة الأمانة غير محسوبة</div></div><div class="r"><b>${fmt(val)}</b></div></div>
-  </div>`;
-}
-
-function viewPeople(){
-  if(ui.person){
-    const p=pers(ui.person); if(!p){ui.person=null;return viewPeople();}
-    const ms=S.moves.filter(m=>m.personId===p.id).reverse();
-    const gifts=n(ms.filter(m=>m.type==='gift').reduce((s,m)=>s+giftValue(m),0));
-    const disc=n(ms.reduce((s,m)=>s+discountOf(m),0));
-    const bought=n(ms.filter(m=>m.type==='sale').reduce((s,m)=>s+n(m.total),0));
-    return `<div style="margin-top:14px"><button class="btn ghost sm" id="back">رجوع للقائمة</button>
-    <div class="card" style="margin-top:12px">
-      <h2>${esc(p.name)} ${p.friend?'<span class="tag t-friend">صديق</span>':''}</h2>
-      <div class="grid g3" style="margin:12px 0">
-        <div class="stat"><div class="lbl">الباقي عليه</div><div class="num ${debtOf(p.id)>0?'neg':''}">${fmt(debtOf(p.id))}</div></div>
-        <div class="stat"><div class="lbl">أعطيته ببلاش</div><div class="num">${fmt(gifts)}</div></div>
-        <div class="stat"><div class="lbl">خصومات</div><div class="num">${fmt(disc)}</div></div>
-      </div>
-      <div class="sub" style="margin-bottom:6px">اشترى بـ ${fmt(bought)}</div>
-      ${ms.length? ms.map(m=>`<div class="row"><div>${moveLabel(m)}<div class="sub">${m.date}${discountOf(m)>0?' · خصم '+fmt(discountOf(m)):''}</div></div><div class="r">${moveAmount(m)}</div></div>`).join('')
-        :'<div class="empty">ما في عمليات مسجلة له.</div>'}
-    </div></div>`;
-  }
-  return `<div class="card" style="margin-top:14px"><h2>العملاء والأصدقاء</h2>
-    ${S.people.length? S.people.map(p=>`<div class="row"><div><a href="#" data-person="${p.id}" style="color:var(--ink);font-weight:500">${esc(p.name)}</a>
-      ${p.friend?'<span class="tag t-friend">صديق</span>':''}<div class="sub">${esc(p.phone||'بدون رقم')}</div></div>
-      <div class="r ${debtOf(p.id)>0?'neg':'sub'}">${debtOf(p.id)>0?'عليه '+fmt(debtOf(p.id)):'ما عليه شي'}</div></div>`).join('')
-      :'<div class="empty">أضف الناس من «الإعداد».</div>'}</div>`;
-}
-
-function viewReports(){
-  return `<div style="margin-top:14px">
-  ${Object.keys(SEC).map(k=>{const r=sectionReport(k);return `<div class="card">
-    <h2>${SEC[k].n}</h2>
-    <div class="row"><div>مبيعات</div><div class="r pos">${fmt(r.sales)}</div></div>
-    <div class="row"><div>بضاعة حوّلتها لأقسام ثانية</div><div class="r">${fmt(r.outGoods)}</div></div>
-    <div class="row"><div>مصاريف ومشتريات</div><div class="r neg">${fmt(r.exp)}</div></div>
-    <div class="row"><div>بضاعة جاتك من أقسام ثانية</div><div class="r neg">${fmt(r.inGoods)}</div></div>
-    <div class="row"><div><b>النتيجة</b></div><div class="r ${r.net>=0?'pos':'neg'}"><b>${r.net>=0?'+':'−'}${fmt(Math.abs(r.net))}</b></div></div>
-    <div class="row"><div class="sub">هدايا وخصومات (خارج الحساب)</div><div class="r sub">${fmt(r.gifts+r.disc)}</div></div>
-  </div>`}).join('')}
-  <div class="card"><h2>الخسائر</h2>
-    ${(()=>{const l=S.moves.filter(m=>m.type==='loss');return l.length? l.map(m=>`<div class="row"><div>${moveLabel(m)}<div class="sub">${m.date}</div></div><div class="r neg">${fmt(giftValue(m))}</div></div>`).join('')
-      :'<div class="empty">ما في نفوق ولا تلف مسجل. زين.</div>'})()}
-  </div></div>`;
-}
-
-function viewSetup(){
-  return `<div style="margin-top:14px">
-  <div class="card"><h2>الأصناف</h2>
-    ${S.products.map(p=>`<div class="row"><div>${esc(p.name)} ${tag(p.sec)}<div class="sub">${esc(p.unit)} · ${fmt(p.price)}${p.mine?'':' · أمانة لـ'+esc(p.owner||'')}</div></div>
-      <div class="r"><button class="btn ghost sm" data-del-p="${p.id}">حذف</button></div></div>`).join('')}
-    <div class="grid g2" style="margin-top:12px">
-      <div class="field"><label>الاسم</label><input id="pn" placeholder="تمر، بيض، محراث..."></div>
-      <div class="field"><label>القسم</label><select id="ps">${Object.keys(SEC).map(k=>`<option value="${k}">${SEC[k].n}</option>`).join('')}</select></div>
-      <div class="field"><label>الوحدة</label><input id="pu" placeholder="كيلو، لتر، رأس، حبة"></div>
-      <div class="field"><label>السعر المرجعي</label><input id="pp" type="number" step="any" min="0" value="0"></div>
-    </div>
-    <label style="display:flex;gap:8px;align-items:center;margin:0 0 10px">
-      <input type="checkbox" id="pm" style="width:auto"> بضاعة أمانة لشخص ثاني</label>
-    <div class="grid g2" id="ownerBox" style="display:none">
-      <div class="field"><label>صاحبها</label><input id="po"></div>
-      <div class="field"><label>عمولتك %</label><input id="pc" type="number" step="any" min="0" value="10"></div>
-    </div>
-    <button class="btn" id="addP">إضافة صنف</button>
-  </div>
-  <div class="card"><h2>الناس</h2>
-    ${S.people.map(p=>`<div class="row"><div>${esc(p.name)} ${p.friend?'<span class="tag t-friend">صديق</span>':''}<div class="sub">${esc(p.phone||'—')}</div></div>
-      <div class="r"><button class="btn ghost sm" data-fr="${p.id}">${p.friend?'شيل صديق':'خله صديق'}</button></div></div>`).join('')}
-    <div class="grid g2" style="margin-top:12px">
-      <div class="field"><label>الاسم</label><input id="hn"></div>
-      <div class="field"><label>الجوال</label><input id="hp"></div>
-    </div>
-    <label style="display:flex;gap:8px;align-items:center;margin:0 0 10px"><input type="checkbox" id="hf" style="width:auto"> صديق</label>
-    <button class="btn" id="addH">إضافة شخص</button>
-  </div>
-  <div class="card"><h2>البيانات</h2>
-    <p class="hint" style="margin-bottom:10px">بياناتك محفوظة تلقائياً. «حفظ نسخة» ينزّل ملف احتياطي.</p>
-    <button class="btn danger sm" id="wipe">مسح كل البيانات</button>
-  </div></div>`;
-}
-
-/* ---------- التوجيه ---------- */
-function render(){
-  document.getElementById('tabs').innerHTML = TABS.map(([k,l])=>
-    `<button data-tab="${k}" aria-current="${ui.tab===k}">${l}</button>`).join('');
-  const v={home:viewHome,new:viewNew,stock:viewStock,people:viewPeople,reports:viewReports,setup:viewSetup};
-  document.getElementById('view').innerHTML = v[ui.tab]();
-  if(ui.tab==='new') wireForm();
-  window.scrollTo({top:0});
-}
-
-function wireForm(){
-  const g=id=>document.getElementById(id);
-  const f=ui.form;
-  if(f==='sale'){
-    const sync=()=>{
-      const p=prod(g('product').value); const per=pers(g('person').value);
-      const qtyV=n(g('qty').value), price=n(g('price').value), total=n(qtyV*price);
-      g('total').value=fmt(total);
-      const cash=Math.min(n(g('cash').value),total);
-      const goods=Math.min(n(g('goods').value),total-cash);
-      const debt=n(total-cash-goods);
-      const w=x=>total>0?(x/total*100)+'%':'0%';
-      g('bCash').style.width=w(cash); g('bGoods').style.width=w(goods); g('bDebt').style.width=w(debt);
-      g('lCash').textContent=fmt(cash); g('lGoods').textContent=fmt(goods); g('lDebt').textContent=fmt(debt);
-      g('friendNote').innerHTML = (per&&per.friend&&p)
-        ? `<div class="note">${esc(per.name)} في قائمة الأصدقاء. سعرك المرجعي ${fmt(p.price)} — لو نزّلته، الفرق ينسجل خصم باسمه.
-           ${price<p.price?`<b> خصم حالي: ${fmt((p.price-price)*qtyV)}</b>`:''}</div>` : '';
-      g('goodsBox').innerHTML = goods>0
-        ? `<div class="field"><label>البضاعة اللي أخذتها مقابل ${fmt(goods)}</label>
-           <select id="goodsProduct"><option value="supplies">مستلزمات (تنقص مصاريف القسم)</option>${opts(S.products,null,x=>x.name)}</select>
-           <input id="goodsQty" type="number" step="any" min="0" value="0" placeholder="الكمية الداخلة" style="margin-top:8px"></div>` : '';
-    };
-    ['product','person','qty','price','cash','goods'].forEach(id=>{
-      g(id)?.addEventListener('input',sync); g(id)?.addEventListener('change',sync);
+/* أعمدة مجمّعة — الأحدث إلى اليسار (اتجاه القراءة العربي) */
+function groupedBars(data, series){
+  if (!data.length) return emptyChart();
+  var d = data.slice().reverse(), max = 0;
+  d.forEach(function(row){ series.forEach(function(s){ max = Math.max(max, num(row[s.key])); }); });
+  max = niceMax(max);
+  var plotW = W-PL-PR, plotH = H-PT-PB, step = plotW/d.length;
+  var bw = Math.min(20, (step-10)/series.length);
+  var out = svgOpen() + gridY(max);
+  d.forEach(function(row, i){
+    var cx = PL + step*i + step/2;
+    series.forEach(function(s, j){
+      var v = num(row[s.key]);
+      var h = (v/max)*plotH;
+      var x = cx - (series.length*bw)/2 + j*bw;
+      out += '<rect x="'+x.toFixed(1)+'" y="'+(PT+plotH-h).toFixed(1)+'" width="'+(bw-2)+'" height="'+Math.max(0,h).toFixed(1)+'" fill="'+s.color+'" rx="2">'
+           + '<title>'+esc(row.m+" · "+s.label+" "+NF.format(v))+'</title></rect>';
     });
-    g('product').addEventListener('change',()=>{ const p=prod(g('product').value); if(p) g('price').value=p.price; sync(); });
-    const p0=prod(g('product').value); if(p0) g('price').value=p0.price;
-    sync();
-  }
-  document.getElementById('submit')?.addEventListener('click',submitForm);
+    out += '<text x="'+cx+'" y="'+(H-10)+'" fill="#a49c8c" font-size="10" text-anchor="middle">'+esc(row.m)+'</text>';
+  });
+  return out + '</svg>' + legend(series);
+}
+function lines(data, series){
+  if (!data.length) return emptyChart();
+  var d = data.slice().reverse(), max = 0;
+  d.forEach(function(row){ series.forEach(function(s){ max = Math.max(max, num(row[s.key])); }); });
+  max = niceMax(max);
+  var plotW = W-PL-PR, plotH = H-PT-PB, step = d.length>1 ? plotW/(d.length-1) : 0;
+  var out = svgOpen() + gridY(max);
+  series.forEach(function(s){
+    var pts = d.map(function(row,i){
+      var x = PL + (d.length>1 ? step*i : plotW/2);
+      var y = PT + plotH - (num(row[s.key])/max)*plotH;
+      return x.toFixed(1)+","+y.toFixed(1);
+    });
+    out += '<polyline points="'+pts.join(" ")+'" fill="none" stroke="'+s.color+'" stroke-width="2" stroke-linejoin="round"/>';
+    d.forEach(function(row,i){
+      var x = PL + (d.length>1 ? step*i : plotW/2);
+      var y = PT + plotH - (num(row[s.key])/max)*plotH;
+      out += '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3" fill="'+s.color+'">'
+           + '<title>'+esc(row.m+" · "+s.label+" "+NF.format(num(row[s.key])))+'</title></circle>';
+    });
+  });
+  d.forEach(function(row,i){
+    var x = PL + (d.length>1 ? step*i : plotW/2);
+    out += '<text x="'+x+'" y="'+(H-10)+'" fill="#a49c8c" font-size="10" text-anchor="middle">'+esc(row.m)+'</text>';
+  });
+  return out + '</svg>' + legend(series);
+}
+/* أعمدة أفقية تمتد من اليمين إلى اليسار */
+function hBars(data, color, unit){
+  if (!data.length) return emptyChart();
+  var max = niceMax(Math.max.apply(null, data.map(function(x){ return x.value; })));
+  var labelW = 108, rowH = Math.min(34, (H-PT-10)/data.length);
+  var barMax = W - labelW - 20;
+  var out = svgOpen();
+  data.forEach(function(row,i){
+    var y = PT + i*rowH;
+    var w = (row.value/max)*barMax;
+    out += '<text x="'+(W-6)+'" y="'+(y+rowH/2+4)+'" fill="#e8e1d1" font-size="11" text-anchor="end">'+esc(row.name)+'</text>';
+    out += '<rect x="'+(W-labelW-w).toFixed(1)+'" y="'+(y+4)+'" width="'+Math.max(0,w).toFixed(1)+'" height="'+(rowH-12)+'" fill="'+color+'" rx="2">'
+         + '<title>'+esc(row.name+" · "+NF.format(row.value)+" "+unit)+'</title></rect>';
+    out += '<text x="'+(W-labelW-w-6).toFixed(1)+'" y="'+(y+rowH/2+4)+'" fill="#a49c8c" font-size="10" text-anchor="end">'+NF.format(row.value)+'</text>';
+  });
+  return out + '</svg>';
+}
+function donut(data, colors){
+  var total = data.reduce(function(s,x){ return s + x.value; }, 0);
+  if (!total) return emptyChart();
+  var cx = W/2, cy = H/2, r = 88, ri = 50, a0 = -Math.PI/2, out = svgOpen();
+  data.forEach(function(row,i){
+    var a1 = a0 + (row.value/total) * Math.PI * 2;
+    var large = (a1-a0) > Math.PI ? 1 : 0;
+    var p = [
+      "M", (cx+r*Math.cos(a0)).toFixed(2), (cy+r*Math.sin(a0)).toFixed(2),
+      "A", r, r, 0, large, 1, (cx+r*Math.cos(a1)).toFixed(2), (cy+r*Math.sin(a1)).toFixed(2),
+      "L", (cx+ri*Math.cos(a1)).toFixed(2), (cy+ri*Math.sin(a1)).toFixed(2),
+      "A", ri, ri, 0, large, 0, (cx+ri*Math.cos(a0)).toFixed(2), (cy+ri*Math.sin(a0)).toFixed(2), "Z"
+    ].join(" ");
+    out += '<path d="'+p+'" fill="'+colors[i%colors.length]+'" stroke="#2a2622" stroke-width="1">'
+         + '<title>'+esc(row.name+" · "+money(row.value)+" "+SAR+" ("+NF.format(row.value/total*100)+"%)")+'</title></path>';
+    a0 = a1;
+  });
+  out += '<text x="'+cx+'" y="'+(cy+5)+'" fill="#e8e1d1" font-size="15" text-anchor="middle">'+money(total)+'</text>';
+  return out + '</svg>' + legend(data.map(function(row,i){
+    return { label: row.name + " " + NF.format(row.value/total*100) + "%", color: colors[i%colors.length] };
+  }));
+}
+function legend(series){
+  return '<div class="legend">' + series.map(function(s){
+    return '<span><i style="background:'+s.color+'"></i>'+esc(s.label)+'</span>';
+  }).join("") + '</div>';
+}
+function emptyChart(){ return '<div class="empty"><p>لا توجد بيانات كافية لهذا الرسم.</p></div>'; }
+
+/* ============================================================
+   الصفحات
+   ============================================================ */
+function sechead(eyebrow, title, lead){
+  return '<div class="sechead"><span class="eyebrow">— '+eyebrow+'</span><h2>'+title+'</h2><p>'+lead+'</p></div>';
+}
+function stat(label, value, suffix, tone){
+  return '<div class="stat '+(tone||"")+'"><span class="sl">'+label+'</span>'
+       + '<b class="sv">'+value+(suffix?' <em>'+suffix+'</em>':'')+'</b></div>';
 }
 
-function submitForm(){
-  const g=id=>document.getElementById(id);
-  const f=ui.form, date=g('date')?.value||today();
-  const m={id:uid(),type:f,date};
-  const need=(c,msg)=>{ if(!c){toast(msg);return false;} return true; };
+/* ---------- 1) إدخال البيانات ---------- */
+function pageEntry(){
+  var k = KINDS[state.kind];
+  var html = sechead("سجل اليوم", "إدخال البيانات",
+    "كل عملية في المزرعة تُسجَّل هنا مرة واحدة، وتظهر تلقائياً في التقارير والتحليل والاقتراحات.");
 
-  if(['sale','gift','production','purchase','transfer','loss','consume'].includes(f)){
-    if(!need(g('product')?.value,'اختر الصنف أولاً')) return;
-    m.productId=g('product').value; m.qty=n(g('qty').value);
-    if(!need(m.qty>0,'اكتب كمية أكبر من صفر')) return;
-    if(['sale','gift','transfer','loss','consume'].includes(f)){
-      const have=stock(m.productId);
-      if(!need(m.qty<=have,`المخزون ${fmt(have)} فقط — ما يكفي`)) return;
+  html += '<div class="kindrow">' + Object.keys(KINDS).map(function(key){
+    return '<button class="kindchip'+(state.kind===key?" on":"")+'" data-act="kind" data-kind="'+key+'">'
+         + KINDS[key].icon + ' ' + KINDS[key].label + '</button>';
+  }).join("") + '</div>';
+
+  html += '<div class="panel"><div class="panel-head"><h3>'+k.icon+' '+k.label+'</h3>'
+        + '<span class="panel-tag">'+k.section+'</span></div><div class="formgrid" id="form">';
+
+  k.fields.forEach(function(f){
+    var seed = {}; k.fields.forEach(function(x){ if (x.t==="select") seed[x.n] = x.o[0]; });
+    var unit = unitOf(seed, f);
+    html += '<label class="field'+(f.wide?" wide":"")+'"><span class="flabel">'+f.l
+          + (unit ? '<em class="unit" data-unit="'+f.n+'">'+unit+'</em>' : '') + '</span>';
+    if (f.t === "select"){
+      html += '<select data-name="'+f.n+'">' + f.o.map(function(o){
+        return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join("") + '</select>';
+    } else {
+      html += '<input type="'+(f.t==="number"?"number":f.t==="date"?"date":"text")+'" data-name="'+f.n+'"'
+            + (f.t==="date" ? ' value="'+today()+'"' : '')
+            + (f.t==="number" ? ' min="0" step="any"' : '')
+            + (f.t==="text" ? ' placeholder="اختياري"' : '') + '>';
+    }
+    html += '</label>';
+  });
+
+  html += '</div><p class="hint" id="formHint"></p><p class="err" id="formErr" hidden></p>'
+        + '<div class="actions"><button class="btn gold" data-act="save">حفظ السجل</button>'
+        + '<button class="btn ghost" data-act="clear">تفريغ الحقول</button></div></div>';
+
+  var recent = state.records.slice(0,8);
+  html += '<div class="panel"><div class="panel-head"><h3>آخر ما أُدخل</h3>'
+        + '<span class="panel-tag">'+state.records.length+' سجل في المزرعة</span></div>';
+  if (!recent.length){
+    html += '<div class="empty"><p>لا توجد سجلات بعد. ابدأ بإدخال أول عملية من النموذج أعلاه، أو جرّب التطبيق ببيانات جاهزة.</p>'
+          + '<button class="btn ghost" data-act="demo">تعبئة بيانات تجريبية</button></div>';
+  } else {
+    html += '<ul class="feed">' + recent.map(function(r){
+      return '<li><span>'+KINDS[r.kind].icon+'</span><span class="fd">'+esc(r.date)+'</span>'
+           + '<span class="ft">'+esc(describe(r))+'</span>'
+           + '<button class="linkbtn" data-act="del" data-id="'+r.id+'">حذف</button></li>';
+    }).join("") + '</ul>';
+  }
+  html += '</div>';
+
+  html += '<div class="panel"><div class="panel-head"><h3>نسخة احتياطية</h3>'
+        + '<span class="panel-tag">تصدير واستيراد كل السجلات</span></div>'
+        + '<p class="hint">احتفظ بنسخة من بياناتك أو انقلها إلى جهاز آخر عبر ملف نصي.</p>'
+        + '<div class="actions"><button class="btn ghost" data-act="export-json">تصدير نسخة</button>'
+        + '<button class="btn ghost" data-act="import-json">استيراد نسخة</button>'
+        + '<button class="btn ghost" data-act="wipe">حذف كل البيانات</button></div></div>';
+  return html;
+}
+
+function readForm(){
+  var rec = { kind: state.kind };
+  var nodes = document.querySelectorAll("#form [data-name]");
+  for (var i=0;i<nodes.length;i++) rec[nodes[i].getAttribute("data-name")] = nodes[i].value;
+  rec.id = uid();
+  return rec;
+}
+function refreshDynamic(){
+  var k = KINDS[state.kind], cur = readForm();
+  k.fields.forEach(function(f){
+    if (!f.dyn) return;
+    var el = document.querySelector('[data-unit="'+f.n+'"]');
+    if (el) el.textContent = unitOf(cur, f);
+  });
+  var hint = document.getElementById("formHint");
+  if (!hint) return;
+  if (state.kind === "ops" && OPS[cur.opType]) hint.textContent = OPS[cur.opType].hint;
+  else if (state.kind === "flock" && FLOCK[cur.category]) hint.textContent = FLOCK[cur.category].hint;
+  else if (state.kind === "sales") hint.innerHTML = "قيمة هذه المبيعة: <b>" + money(num(cur.qty)*num(cur.price)) + " " + SAR + "</b>";
+  else hint.textContent = "";
+}
+function submitForm(){
+  var rec = readForm(), err = document.getElementById("formErr"), msg = "";
+  var hasQty = KINDS[state.kind].fields.some(function(f){ return f.n === "qty"; });
+  if (!rec.date) msg = "أدخل التاريخ قبل الحفظ.";
+  else if (hasQty && num(rec.qty) <= 0) msg = "أدخل مقداراً أكبر من صفر.";
+  else if (state.kind === "expense" && num(rec.cost) <= 0) msg = "أدخل مبلغ المصروف.";
+  else if (state.kind === "sales" && num(rec.price) <= 0) msg = "أدخل سعر الوحدة.";
+  if (msg){ err.textContent = msg; err.hidden = false; return; }
+  err.hidden = true;
+  addRecord(rec);
+  render();
+  toast("تم حفظ السجل");
+}
+
+/* ---------- 2) التقارير ---------- */
+function filteredRows(){
+  var f = state.filters;
+  return state.records.filter(function(r){
+    if (f.kind !== "all" && r.kind !== f.kind) return false;
+    if (f.from && r.date < f.from) return false;
+    if (f.to && r.date > f.to) return false;
+    if (f.q && describe(r).indexOf(f.q) < 0 && (r.note||"").indexOf(f.q) < 0) return false;
+    return true;
+  }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+}
+function pageReports(){
+  var rows = filteredRows(), f = state.filters;
+  var rev = rows.reduce(function(s,r){ return s + revenueOf(r); }, 0);
+  var cost = rows.reduce(function(s,r){ return s + costOf(r); }, 0);
+
+  var html = sechead("السجل الكامل", "التقارير",
+    "اختر الفترة ونوع السجل لاستخراج تقرير مفصّل بالإيرادات والتكاليف.");
+
+  html += '<div class="filters">'
+    + '<label class="field"><span class="flabel">نوع السجل</span><select data-filter="kind">'
+    + '<option value="all"'+(f.kind==="all"?" selected":"")+'>كل الأنواع</option>'
+    + Object.keys(KINDS).map(function(k){
+        return '<option value="'+k+'"'+(f.kind===k?" selected":"")+'>'+KINDS[k].label+'</option>'; }).join("")
+    + '</select></label>'
+    + '<label class="field"><span class="flabel">من تاريخ</span><input type="date" data-filter="from" value="'+esc(f.from)+'"></label>'
+    + '<label class="field"><span class="flabel">إلى تاريخ</span><input type="date" data-filter="to" value="'+esc(f.to)+'"></label>'
+    + '<label class="field"><span class="flabel">بحث</span><input type="text" data-filter="q" placeholder="صنف، موقع، قناة بيع…" value="'+esc(f.q)+'"></label>'
+    + '<div class="field"><span class="flabel">&nbsp;</span><button class="btn gold" data-act="csv"'+(rows.length?"":" disabled")+'>تصدير CSV</button></div>'
+    + '</div>';
+
+  html += '<div class="statstrip">'
+    + stat("عدد السجلات", NF.format(rows.length))
+    + stat("الإيرادات", money(rev), SAR, "good")
+    + stat("التكاليف", money(cost), SAR, "warn")
+    + stat("الصافي", money(rev-cost), SAR, rev-cost >= 0 ? "good" : "bad")
+    + '</div>';
+
+  html += '<div class="panel">';
+  if (!rows.length){
+    html += '<div class="empty"><p>لا توجد سجلات ضمن هذه الفترة. وسّع نطاق التاريخ أو غيّر نوع السجل.</p></div>';
+  } else {
+    html += '<div class="tablewrap"><table class="tbl"><thead><tr>'
+      + '<th>التاريخ</th><th>النوع</th><th>التفاصيل</th><th>الإيراد</th><th>التكلفة</th><th>ملاحظة</th><th></th>'
+      + '</tr></thead><tbody>'
+      + rows.map(function(r){
+          return '<tr><td class="mono">'+esc(r.date)+'</td>'
+            + '<td><span class="pill">'+KINDS[r.kind].icon+' '+KINDS[r.kind].label+'</span></td>'
+            + '<td>'+esc(describe(r))+'</td>'
+            + '<td class="mono good">'+(revenueOf(r)?money(revenueOf(r)):"—")+'</td>'
+            + '<td class="mono warn">'+(costOf(r)?money(costOf(r)):"—")+'</td>'
+            + '<td class="muted">'+(r.note?esc(r.note):"—")+'</td>'
+            + '<td><button class="linkbtn" data-act="del" data-id="'+r.id+'">حذف</button></td></tr>';
+        }).join("")
+      + '</tbody><tfoot><tr><td colspan="3">الإجمالي</td>'
+      + '<td class="mono good">'+money(rev)+'</td><td class="mono warn">'+money(cost)+'</td>'
+      + '<td colspan="2" class="mono">الصافي '+money(rev-cost)+' '+SAR+'</td></tr></tfoot></table></div>';
+  }
+  html += '</div>';
+  return html;
+}
+function exportCsv(){
+  var rows = filteredRows();
+  var lines = ["التاريخ,النوع,التفاصيل,الإيراد,التكلفة,ملاحظة"];
+  rows.forEach(function(r){
+    lines.push([r.date, KINDS[r.kind].label, '"'+describe(r)+'"',
+      Math.round(revenueOf(r)), Math.round(costOf(r)), '"'+(r.note||"")+'"'].join(","));
+  });
+  var text = "\uFEFF" + lines.join("\n");
+  download("تقرير-مزرعتي.csv", text, "text/csv;charset=utf-8");
+  openModal("نسخة نصية من التقرير",
+    "إذا لم يبدأ التنزيل تلقائياً، انسخ المحتوى التالي والصقه في جدول بيانات.", text, false);
+}
+function download(name, text, mime){
+  try {
+    var blob = new Blob([text], { type: mime });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  } catch(e){}
+}
+
+/* ---------- 3) التحليل ---------- */
+function pageAnalysis(){
+  var a = analyze(state.records);
+  var html = sechead("المؤشرات", "التحليل",
+    "أداء القسمين ودورة الموارد بينهما، محسوباً من سجلاتك مباشرة.");
+
+  if (!state.records.length){
+    return html + '<div class="panel"><div class="empty"><p>لا توجد بيانات لتحليلها بعد. أدخل بضعة سجلات من صفحة إدخال البيانات وستظهر المؤشرات هنا.</p></div></div>';
+  }
+
+  html += '<div class="statstrip">'
+    + stat("صافي المزرعة", money(a.net), SAR, a.net>=0?"good":"bad")
+    + stat("الإيرادات", money(a.rev), SAR)
+    + stat("التكاليف", money(a.cost), SAR)
+    + stat("شتلات منتجة", fmt(a.plantsQty), "شتلة")
+    + stat("مياه الريّ", fmt(a.water), "م³")
+    + stat("تدوير المياه", fmt(a.recycleRate), "%", a.recycleRate>=20?"good":"warn")
+    + '</div>';
+
+  html += '<div class="chartgrid">';
+
+  html += card("الإيرادات مقابل التكاليف شهرياً",
+    groupedBars(a.monthly, [
+      { key:"rev", label:"إيرادات", color:"#d9a441" },
+      { key:"cost", label:"تكاليف", color:"#7d9a63" }
+    ]), "المسار المالي للمزرعة عبر الأشهر ("+SAR+").");
+
+  html += card("استهلاك المياه والتدوير",
+    lines(a.monthly, [
+      { key:"water", label:"ريّ", color:"#6f8fa6" },
+      { key:"recycled", label:"معاد تدويره", color:"#7d9a63" }
+    ]), "مياه الريّ مقابل المياه المعاد تدويرها شهرياً (م³).");
+
+  html += card("الإنتاج حسب الموقع", hBars(a.byZone, "#7d9a63", "شتلة"),
+    "مجموع الشتلات المنتجة في كل بيت زجاجي ومشتل.");
+
+  html += card("المبيعات حسب القناة", donut(a.byChannel, ["#d9a441","#7d9a63","#b9663f","#6f8fa6"]),
+    "توزيع الإيراد على قنوات البيع.");
+
+  html += card("التكاليف حسب القسم", hBars(a.bySection, "#b9663f", SAR),
+    "أين يُصرف المال داخل المنظومة.");
+
+  var cyc = '<div class="cycleview">'
+    + cnode("روث مجمّع", a.manure, "كجم") + '<span class="arrow">←</span>'
+    + cnode("سماد عضوي", a.compost, "كجم") + '<span class="arrow">←</span>'
+    + cnode("غاز حيوي", a.biogas, "م³") + '</div>'
+    + '<p class="hint">معدل تحويل الروث إلى سماد: <b>'+fmt(a.convRate)+'%</b> — السماد المنتج يغطي احتياج التسميد المسجَّل بنسبة <b>'+fmt(a.compostCover)+'%</b>.</p>';
+  html += card("دورة الموارد", cyc, "من روث القطيع إلى سماد يغذّي النباتات وغاز حيوي يغطي جزءاً من الطاقة.");
+
+  html += '</div>';
+  return html;
+}
+function card(title, body, note){
+  return '<section class="panel"><div class="panel-head"><h3>'+title+'</h3></div>'
+       + body + (note ? '<p class="cardnote">'+note+'</p>' : '') + '</section>';
+}
+function cnode(label, value, unit){
+  return '<div class="cnode"><b>'+fmt(value)+'</b><em>'+unit+'</em><span>'+label+'</span></div>';
+}
+
+/* ---------- 4) الاقتراحات ---------- */
+function suggest(recs, a){
+  var out = [];
+  function add(type, area, title, body, evidence){ out.push({type:type, area:area, title:title, body:body, evidence:evidence}); }
+
+  /* المالية */
+  if (a.net < 0){
+    var worst = a.bySection.slice().sort(function(x,y){ return y.value-x.value; })[0];
+    add("alert","المردود","التكاليف تتجاوز الإيرادات",
+      "راجع بنود الصرف الأعلى وقارنها بإيراد كل قسم قبل التوسّع في الإنتاج.",
+      "الصافي "+money(a.net)+" "+SAR+" · أعلى قسم صرفاً: "+(worst?worst.name:"—"));
+  } else if (a.rev > 0){
+    add("ok","المردود","الإيرادات تغطي التكاليف",
+      "استمر في المسار الحالي، ووجّه الفائض إلى تحسين البيوت الزجاجية والحظائر.",
+      "الصافي "+money(a.net)+" "+SAR+" بهامش "+fmt(a.net/a.rev*100)+"%");
+  }
+
+  var expBy = {}, expTotal = 0;
+  recs.filter(function(r){ return r.kind === "expense"; }).forEach(function(r){
+    expBy[r.category] = (expBy[r.category]||0) + num(r.cost); expTotal += num(r.cost);
+  });
+  var topExp = Object.keys(expBy).map(function(k){ return [k, expBy[k]]; })
+    .sort(function(x,y){ return y[1]-x[1]; })[0];
+  if (topExp && expTotal && topExp[1]/expTotal > 0.4){
+    add("opp","المردود","بند «"+topExp[0]+"» يستحوذ على معظم المصروفات",
+      "بند واحد بهذا الحجم يعني أن أي تحسين فيه ينعكس مباشرة على الربح. اطلب عروض أسعار بديلة أو ابحث عن تغطية داخلية من موارد المزرعة.",
+      money(topExp[1])+" "+SAR+" من أصل "+money(expTotal)+" "+SAR+" ("+fmt(topExp[1]/expTotal*100)+"%)");
+  }
+
+  /* التسويق */
+  var totalCh = a.byChannel.reduce(function(s,c){ return s + c.value; }, 0);
+  if (a.byChannel.length && totalCh){
+    var top = a.byChannel[0];
+    if (top.value/totalCh > 0.7){
+      add("opp","التسويق","المبيعات معتمدة على قناة واحدة",
+        "الاعتماد على قناة واحدة يجعل الإيراد هشاً. ابنِ شراكات طويلة الأجل مع موزّعين، ووسّع البيع المباشر من المزرعة.",
+        top.name+" تشكّل "+fmt(top.value/totalCh*100)+"% من الإيراد");
+    } else {
+      add("ok","التسويق","قنوات البيع متنوعة",
+        "التوزيع الحالي يحمي الإيراد من تقلّب قناة واحدة. ثبّت العلاقات مع أفضل قناتين بعقود موسمية.",
+        a.byChannel.length+" قنوات نشطة");
     }
   }
-  if(f==='sale'){
-    m.personId=g('person').value; m.price=n(g('price').value); m.total=n(m.qty*m.price);
-    m.cash=Math.min(n(g('cash').value),m.total);
-    m.goods=Math.min(n(g('goods').value),m.total-m.cash);
-    m.debt=n(m.total-m.cash-m.goods);
-    const gp=g('goodsProduct')?.value;
-    if(m.goods>0 && gp && gp!=='supplies'){ m.goodsProductId=gp; m.goodsQty=n(g('goodsQty').value); }
-    if(m.goods>0 && gp==='supplies'){ m.goodsSupplies=true; }
+  if (!recs.some(function(r){ return r.kind === "sales" && r.channel === "موزّع بشراكة"; })){
+    add("opp","التسويق","لا توجد مبيعات عبر شراكات ثابتة",
+      "الشراكات طويلة الأجل مع الموزّعين تضمن تصريف الإنتاج قبل موسم الحصاد وتقلّل الفاقد.", null);
   }
-  if(f==='gift') m.personId=g('person').value;
-  if(f==='purchase'){ m.total=n(g('total').value); m.amount=m.total; m.cash=Math.min(n(g('cash').value),m.total); }
-  if(f==='expense'){
-    m.sec=g('sec').value; m.amount=n(g('amount').value); m.cash=m.amount; m.note=g('note').value;
-    if(!need(m.amount>0,'اكتب المبلغ')) return;
+
+  /* المياه والعمليات */
+  var mo = a.monthly;
+  if (mo.length >= 2){
+    var last = mo[mo.length-1], prev = mo[mo.length-2];
+    if (prev.water > 0 && last.water > prev.water*1.2){
+      add("alert","تحسين بيئة","استهلاك مياه الريّ يرتفع",
+        "ارتفاع بهذا القدر خلال شهر واحد يشير غالباً إلى تسريب أو ريّ زائد. افحص شبكة الريّ وراجع جدول كل بيت زجاجي حسب نوع النبات.",
+        fmt(last.water)+" م³ هذا الشهر مقابل "+fmt(prev.water)+" م³ في السابق");
+    }
   }
-  if(f==='transfer') m.toSec=g('toSec').value;
-  if(f==='payment'){
-    m.personId=g('person').value; m.amount=n(g('amount').value);
-    if(!need(m.amount>0,'اكتب المبلغ')) return;
-    const d=debtOf(m.personId);
-    if(!need(m.amount<=d,`الباقي عليه ${fmt(d)} فقط`)) return;
+  if (a.water > 0 && a.recycleRate < 20){
+    add("opp","الاستدامة","نسبة المياه المعاد تدويرها منخفضة",
+      "بركة التجميع قادرة على تغطية جزء أكبر من الريّ. وجّه مياه الغسيل والتكثيف في البيوت الزجاجية إليها قبل السحب من المصدر الرئيسي.",
+      "التدوير يغطي "+fmt(a.recycleRate)+"% من مياه الريّ");
+  } else if (a.water > 0){
+    add("ok","الاستدامة","تدوير المياه يعمل بكفاءة",
+      "حافظ على صيانة بركة التجميع وسجّل كل دفعة معاد تدويرها للحفاظ على دقة المؤشر.",
+      fmt(a.recycleRate)+"% من مياه الريّ معاد تدويرها");
   }
-  S.moves.push(m); save();
-  toast('تم الحفظ');
-  render();
+
+  var lastIrrig = {};
+  recs.filter(function(r){ return r.kind === "ops" && r.opType === "ريّ"; }).forEach(function(r){
+    var d = daysSince(r.date);
+    if (lastIrrig[r.zone] === undefined || lastIrrig[r.zone] > d) lastIrrig[r.zone] = d;
+  });
+  var active = {};
+  recs.filter(function(r){ return r.kind === "plants" && daysSince(r.date) < 120; }).forEach(function(r){ active[r.zone] = true; });
+  var dry = Object.keys(active).filter(function(z){ return lastIrrig[z] === undefined || lastIrrig[z] > 10; });
+  if (dry.length){
+    add("alert","العمليات","مواقع منتِجة بلا سجل ريّ حديث",
+      "إما أن الريّ يحدث دون تسجيل، أو أن هذه المواقع فعلاً متأخرة. راجعها اليوم وسجّل كل دورة ريّ لتبقى المؤشرات صحيحة.",
+      dry.join("، "));
+  }
+
+  /* الأغنام */
+  var health = recs.filter(function(r){ return r.kind === "flock" && r.category === "صحة"; })
+                   .map(function(r){ return daysSince(r.date); }).sort(function(x,y){ return x-y; })[0];
+  if (health === undefined){
+    add("alert","قسم الأغنام","لا توجد سجلات صحة أو تطعيم",
+      "الفحوصات الدورية والتطعيمات هي أرخص وقاية في القطيع. حدّد موعداً بيطرياً وسجّله ليبدأ التتبع.", null);
+  } else if (health > 90){
+    add("alert","قسم الأغنام","مضى وقت طويل على آخر فحص بيطري",
+      "الفجوة الطويلة بين الفحوصات ترفع خطر انتشار المرض داخل الحظائر. رتّب زيارة بيطرية قريبة.",
+      "آخر سجل صحة قبل "+fmt(health)+" يوماً");
+  } else {
+    add("ok","قسم الأغنام","المتابعة البيطرية منتظمة",
+      "استمر على هذا الإيقاع واربط كل فحص بعدد الرؤوس المعالجة لرصد أي تكرار غير طبيعي.",
+      "آخر سجل صحة قبل "+fmt(health)+" يوماً");
+  }
+
+  var feed = recs.filter(function(r){ return r.kind === "flock" && r.category === "تغذية"; });
+  var heads = feed.length ? num(feed[0].head) : 0;
+  if (feed.length >= 4 && heads > 0){
+    var perHead = feed.reduce(function(s,r){ return s + num(r.qty); }, 0) / feed.length / heads;
+    if (perHead > 3.5){
+      add("opp","قسم الأغنام","استهلاك العلف لكل رأس مرتفع",
+        "راجع خلط العلف ونسبة الرعي الطبيعي في المراعي؛ زيادة ساعات الرعي تخفض فاتورة الأعلاف دون التأثير على الجودة.",
+        fmt(perHead)+" كجم لكل رأس في السجل الواحد");
+    }
+  }
+
+  /* دورة الموارد */
+  if (a.manure > 0 && a.convRate < 30){
+    add("opp","الاستدامة","جزء كبير من الروث لا يتحول إلى سماد",
+      "وسّع منطقة التسميد وقلّب الأكوام بانتظام؛ كل كيلو يتحول إلى سماد هو كيلو أقل يُشترى من الخارج.",
+      "معدل التحويل "+fmt(a.convRate)+"% من "+fmt(a.manure)+" كجم روث");
+  }
+  if (a.manure > 0 && a.biogas === 0){
+    add("opp","الاستدامة","وحدة الغاز الحيوي غير مستغلة",
+      "يوجد روث مسجَّل دون أي إنتاج غاز حيوي. تشغيل الوحدة يغطي جزءاً من فاتورة الطاقة من مخلفات موجودة أصلاً.",
+      fmt(a.manure)+" كجم روث مجمّع بلا إنتاج غاز");
+  }
+  if (a.compostCover >= 100){
+    add("ok","الاستدامة","السماد الداخلي يغطي احتياج التسميد",
+      "المنظومة تغلق دورتها كما هو مخطط لها: مخلفات القطيع تغذّي النباتات بالكامل.",
+      "تغطية "+fmt(a.compostCover)+"% من التسميد المسجَّل");
+  }
+
+  /* المخزون والإدارة */
+  if (a.plantsQty > 0 && a.soldPlants/a.plantsQty < 0.5){
+    add("opp","المردود","الإنتاج يفوق المبيعات",
+      "الشتلات الجاهزة تتراكم وتستهلك مياهاً وعمالة. قدّم عرضاً لمشاتل التجزئة أو ابدأ البيع المباشر للأفراد قبل تجاوز عمر الشتلة.",
+      "بيع "+fmt(a.soldPlants)+" من أصل "+fmt(a.plantsQty)+" شتلة منتجة");
+  }
+  if (recs.length < 15){
+    add("opp","الإدارة","السجلات ما زالت قليلة",
+      "دقة التحليل ترتفع مع انتظام الإدخال. سجّل عمليات الريّ والتغذية يومياً لمدة أسبوعين وستصبح التوصيات أدق بكثير.",
+      recs.length+" سجل حتى الآن");
+  }
+  return out;
 }
 
-/* ---------- الأحداث ---------- */
-document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-tab],[data-form],[data-person],[data-del-p],[data-fr],#back,#addP,#addH,#wipe,#exportBtn');
-  if(!t) return;
-  const g=id=>document.getElementById(id);
+function pageAdvice(){
+  var a = analyze(state.records), items = suggest(state.records, a);
+  var html = sechead("قراءة البيانات", "الاقتراحات",
+    "قواعد تقرأ سجلاتك وتقترح الخطوة التالية — بنفس منطق المنظومة المتكاملة: لا شيء يُهدر.");
 
-  if(t.dataset.tab){ ui.tab=t.dataset.tab; ui.person=null; return render(); }
-  if(t.dataset.form){ ui.form=t.dataset.form; return render(); }
-  if(t.dataset.person){ e.preventDefault(); ui.person=t.dataset.person; return render(); }
-  if(t.id==='back'){ ui.person=null; return render(); }
-  if(t.dataset.delP){
-    if(S.moves.some(m=>m.productId===t.dataset.delP)) return toast('عليه حركات مسجلة — ما ينحذف');
-    S.products=S.products.filter(p=>p.id!==t.dataset.delP); save(); return render();
+  if (!state.records.length){
+    html += '<div class="panel"><div class="empty"><p>الاقتراحات تُبنى على سجلاتك. أدخل عمليات المزرعة أولاً وستظهر التوصيات هنا.</p></div></div>';
+  } else {
+    [{k:"alert",l:"يحتاج انتباهاً",t:"bad"},
+     {k:"opp",l:"فرص للتحسين",t:"warn"},
+     {k:"ok",l:"مؤشرات سليمة",t:"good"}].forEach(function(g){
+      var list = items.filter(function(i){ return i.type === g.k; });
+      if (!list.length) return;
+      html += '<div class="advgroup"><h3 class="advhead '+g.t+'">'+g.l+' <span>'+list.length+'</span></h3><div class="advlist">'
+        + list.map(function(i){
+            return '<article class="advcard '+g.t+'"><header><h4>'+esc(i.title)+'</h4>'
+              + '<span class="advtag">'+esc(i.area)+'</span></header><p>'+esc(i.body)+'</p>'
+              + (i.evidence ? '<p class="evidence">'+esc(i.evidence)+'</p>' : '') + '</article>';
+          }).join("")
+        + '</div></div>';
+    });
   }
-  if(t.dataset.fr){ const p=pers(t.dataset.fr); p.friend=!p.friend; save(); return render(); }
-  if(t.id==='addP'){
-    const name=g('pn').value.trim(); if(!name) return toast('اكتب اسم الصنف');
-    const mine=!g('pm').checked;
-    S.products.push({id:uid(),name,sec:g('ps').value,unit:g('pu').value.trim()||'وحدة',
-      price:n(g('pp').value),mine,owner:mine?'':g('po')?.value||'',comm:mine?0:n(g('pc')?.value)});
-    save(); toast('انضاف الصنف'); return render();
+
+  html += '<div class="panel next"><div class="panel-head"><h3>الخطوات التالية من خطة المزرعة</h3>'
+    + '<span class="panel-tag">ما بعد الإطلاق</span></div><ol class="nextlist">'
+    + '<li><b>تدريب إدارة</b> — تأهيل الفريق على تشغيل المنظومة المتكاملة ومراقبة مؤشراتها.</li>'
+    + '<li><b>تحسين بيئة</b> — تطوير البيوت الزجاجية والحظائر ورفع كفاءة استهلاك المياه والطاقة.</li>'
+    + '<li><b>خطة تسويق</b> — إطلاق هوية المزرعة وبناء قنوات بيع مباشرة وشراكات ثابتة.</li>'
+    + '</ol><p class="hint">نفّذوا الخطوات الثلاث بشكل متزامن لتحقيق أقصى أثر.</p></div>';
+  return html;
+}
+
+/* ============================================================
+   بيانات تجريبية
+   ============================================================ */
+function demoRecords(){
+  var out = [], w;
+  function d(back){ return new Date(Date.now() - back*86400000).toISOString().slice(0,10); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rnd(n){ return Math.round(Math.random()*n); }
+  for (w=0; w<13; w++){
+    var b = w*7;
+    out.push({id:uid(), kind:"plants", date:d(b+1), zone:pick(ZONES_PLANT),
+      item:pick(["شتلات موسمية","شتلات دائمة","نباتات زينة داخلية","نباتات زينة خارجية"]),
+      qty:300+rnd(400), cost:900+rnd(600), note:""});
+    out.push({id:uid(), kind:"ops", date:d(b+2), opType:"ريّ", zone:pick(ZONES_PLANT), qty:55+rnd(30)+w, cost:120, note:""});
+    out.push({id:uid(), kind:"ops", date:d(b+4), opType:pick(["تجهيز","صيانة","حصاد"]), zone:pick(ZONES_PLANT), qty:40+rnd(120), cost:200+rnd(300), note:""});
+    out.push({id:uid(), kind:"flock", date:d(b+3), category:"تغذية", head:180, qty:520+rnd(120), cost:1600+rnd(500), note:""});
+    if (w % 4 === 0) out.push({id:uid(), kind:"flock", date:d(b+5), category:"تكاثر", head:180, qty:6+rnd(5), cost:150, note:""});
+    if (w % 6 === 0) out.push({id:uid(), kind:"flock", date:d(b+6), category:"صحة", head:180, qty:180, cost:900, note:"تطعيم دوري"});
+    out.push({id:uid(), kind:"sales", date:d(b+6), product:pick(["شتلات","نباتات زينة"]),
+      channel:pick(["مشاتل التجزئة","مشاتل التجزئة","أفراد من المزرعة"]), qty:180+rnd(200), price:12+rnd(10), note:""});
+    if (w % 2 === 0) out.push({id:uid(), kind:"sales", date:d(b+5), product:pick(["لحوم","ألبان"]), channel:"السوق المحلي", qty:60+rnd(80), price:28+rnd(14), note:""});
+    out.push({id:uid(), kind:"cycle", date:d(b+2), resource:"روث مجمّع", qty:400+rnd(150), note:""});
+    out.push({id:uid(), kind:"cycle", date:d(b+5), resource:"سماد عضوي منتج", qty:90+rnd(60), note:""});
+    if (w % 3 === 0) out.push({id:uid(), kind:"cycle", date:d(b+6), resource:"مياه معاد تدويرها", qty:20+rnd(15), note:""});
+    out.push({id:uid(), kind:"expense", date:d(b+1), category:pick(EXP_CATS), section:pick(SECTIONS), cost:400+rnd(900), note:""});
   }
-  if(t.id==='addH'){
-    const name=g('hn').value.trim(); if(!name) return toast('اكتب الاسم');
-    S.people.push({id:uid(),name,phone:g('hp').value.trim(),friend:g('hf').checked});
-    save(); toast('انضاف الشخص'); return render();
+  return out.sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+}
+
+/* ============================================================
+   النافذة والتفاعل
+   ============================================================ */
+function openModal(title, note, text, importMode){
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalNote").textContent = note;
+  var ta = document.getElementById("modalText");
+  ta.value = text; ta.readOnly = !importMode;
+  document.getElementById("importBtn").hidden = !importMode;
+  document.getElementById("modal").hidden = false;
+  if (!importMode) ta.select();
+}
+function closeModal(){ document.getElementById("modal").hidden = true; }
+
+function render(){
+  var p = document.getElementById("page");
+  if (state.tab === "entry") p.innerHTML = pageEntry();
+  else if (state.tab === "reports") p.innerHTML = pageReports();
+  else if (state.tab === "analysis") p.innerHTML = pageAnalysis();
+  else p.innerHTML = pageAdvice();
+
+  var tabs = document.querySelectorAll(".tab");
+  for (var i=0;i<tabs.length;i++)
+    tabs[i].classList.toggle("on", tabs[i].getAttribute("data-tab") === state.tab);
+
+  if (state.tab === "entry") refreshDynamic();
+  window.scrollTo({ top:0, behavior:"auto" });
+}
+
+document.getElementById("tabs").addEventListener("click", function(e){
+  var b = e.target.closest("[data-tab]"); if (!b) return;
+  state.tab = b.getAttribute("data-tab"); render();
+});
+
+document.addEventListener("click", function(e){
+  var b = e.target.closest("[data-act]"); if (!b) return;
+  var act = b.getAttribute("data-act");
+
+  if (act === "kind"){ state.kind = b.getAttribute("data-kind"); render(); }
+  else if (act === "save") submitForm();
+  else if (act === "clear") render();
+  else if (act === "del") delRecord(b.getAttribute("data-id"));
+  else if (act === "demo"){ state.records = demoRecords(); save(); render(); toast("تمت تعبئة بيانات تجريبية لثلاثة أشهر"); }
+  else if (act === "csv") exportCsv();
+  else if (act === "export-json"){
+    var json = JSON.stringify(state.records, null, 2);
+    download("نسخة-مزرعتي.json", json, "application/json");
+    openModal("نسخة احتياطية", "احفظ هذا النص في ملف، أو انسخه إلى جهاز آخر واستورده هناك.", json, false);
   }
-  if(t.id==='wipe'){
-    if(confirm('تمسح كل البيانات؟ ما ترجع.')){ S={products:[],people:[],moves:[]}; seed(); save(); render(); }
-    return;
+  else if (act === "import-json") openModal("استيراد نسخة", "الصق محتوى ملف النسخة الاحتياطية هنا ثم اضغط استيراد. سيحل محل البيانات الحالية.", "", true);
+  else if (act === "modal-import"){
+    try {
+      var data = JSON.parse(document.getElementById("modalText").value);
+      if (!Array.isArray(data)) throw new Error("bad");
+      state.records = data; save(); closeModal(); render(); toast("تم استيراد " + data.length + " سجل");
+    } catch(err){ toast("الملف غير صالح — تأكد من نسخ المحتوى كاملاً"); }
   }
-  if(t.id==='exportBtn'){
-    const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(b);
-    a.download='farm-ledger-'+today()+'.json'; a.click(); URL.revokeObjectURL(a.href);
-    return toast('نزّلت نسخة احتياطية');
+  else if (act === "modal-close") closeModal();
+  else if (act === "wipe"){
+    if (confirm("سيتم حذف جميع سجلات المزرعة نهائياً. هل أنت متأكد؟")){
+      state.records = []; save(); render(); toast("تم حذف كل البيانات");
+    }
   }
 });
-document.addEventListener('change',e=>{
-  if(e.target.id==='pm'){ document.getElementById('ownerBox').style.display=e.target.checked?'grid':'none'; }
+
+document.addEventListener("input", function(e){
+  var t = e.target;
+  if (t.closest("#form")) refreshDynamic();
+  var fkey = t.getAttribute && t.getAttribute("data-filter");
+  if (fkey){ state.filters[fkey] = t.value; renderReportsKeepFocus(fkey); }
+});
+document.addEventListener("change", function(e){
+  if (e.target.closest("#form")) refreshDynamic();
 });
 
-load().then(render);
+/* إعادة رسم التقارير مع إبقاء المؤشر في حقل البحث */
+var reportTimer = null;
+function renderReportsKeepFocus(fkey){
+  clearTimeout(reportTimer);
+  reportTimer = setTimeout(function(){
+    var pos = null, el = document.querySelector('[data-filter="'+fkey+'"]');
+    if (el && el.type === "text") pos = el.selectionStart;
+    render();
+    var el2 = document.querySelector('[data-filter="'+fkey+'"]');
+    if (el2){ el2.focus(); if (pos !== null && el2.setSelectionRange) el2.setSelectionRange(pos, pos); }
+  }, 180);
+}
+
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape") closeModal();
+});
+
+load(function(){ render(); });
 </script>
 </body>
 </html>
