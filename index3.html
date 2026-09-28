@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مزرعتي — إدارة الأقسام الخمسة</title>
+<style>
+:root{
+  --ink:#1f1c19; --ink2:#26231f; --panel:#2a2622; --line:#3b362f;
+  --field:#332f29; --cream:#e8e1d1; --muted:#a49c8c;
+  --gold:#d9a441; --leaf:#3e5138; --green:#7d9a63; --clay:#b9663f; --sky:#6f8fa6;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--ink); color:var(--cream); min-height:100vh;
+  font-family:"Noto Kufi Arabic","Segoe UI",Tahoma,system-ui,sans-serif; font-size:15px; line-height:1.7}
+h2,h3,h4{font-family:Amiri,"Noto Naskh Arabic",Georgia,serif; font-weight:700; margin:0}
+button,input,select,textarea{font-family:inherit; font-size:inherit}
+:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  padding:14px 22px; background:var(--ink2); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:20}
+.brand-mark{font-family:Amiri,Georgia,serif; font-size:26px; color:var(--gold); line-height:1.1; display:block}
+.brand-sub{font-size:11.5px; color:var(--muted)}
+.tabs{display:flex; gap:4px; flex-wrap:wrap}
+.tab{background:none; border:none; color:var(--cream); padding:8px 14px; border-radius:999px; cursor:pointer; opacity:.75}
+.tab:hover{opacity:1; background:#ffffff0d}
+.tab.on{background:var(--gold); color:#231f1a; font-weight:700; opacity:1}
+
+.page{max-width:1180px; margin:0 auto; padding:26px 20px 70px}
+.sechead{margin:8px 0 22px}
+.eyebrow{color:var(--gold); font-size:13px}
+.sechead h2{font-size:34px; margin:2px 0 6px}
+.sechead p{margin:0; color:var(--muted); max-width:62ch}
+
+.kindrow{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px}
+.kindchip{background:var(--panel); border:1px solid var(--line); color:var(--cream); padding:9px 14px; border-radius:10px; cursor:pointer}
+.kindchip:hover{border-color:#5c5548}
+.kindchip.on{border-color:var(--gold); background:#d9a4411a; color:var(--gold)}
+
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:18px}
+.panel-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px}
+.panel-head h3{font-size:20px}
+.panel-tag{font-size:12px; color:var(--muted)}
+
+.formgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px}
+.field{display:flex; flex-direction:column; gap:6px}
+.field.wide{grid-column:1/-1}
+.flabel{font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:center}
+.unit{font-style:normal; font-size:11px; color:var(--gold); background:#d9a4411a; padding:1px 7px; border-radius:999px}
+input,select{background:var(--field); border:1px solid var(--line); color:var(--cream); border-radius:9px; padding:10px 12px; width:100%}
+input:hover,select:hover{border-color:#5c5548}
+input[type=date]{color-scheme:dark}
+
+.hint{margin:14px 0 0; font-size:13.5px; color:var(--muted)}
+.hint b{color:var(--gold)}
+.cropinfo{margin-top:14px; background:var(--ink); border:1px solid var(--line); border-radius:10px; padding:14px 16px; font-size:13.5px}
+.cropinfo[hidden]{display:none}
+.cropinfo dl{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px 18px; margin:0}
+.cropinfo dt{color:var(--muted); font-size:12px}
+.cropinfo dd{margin:0; color:var(--cream)}
+.cropinfo .season{margin:12px 0 0; padding-top:10px; border-top:1px dashed var(--line)}
+.season.ok{color:var(--green)} .season.no{color:var(--clay)}
+.err{margin:12px 0 0; color:#e08d6c; font-size:13.5px}
+.actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+.btn{border-radius:999px; padding:10px 22px; cursor:pointer; border:1px solid transparent}
+.btn.gold{background:var(--gold); color:#231f1a; font-weight:700}
+.btn.gold:hover{background:#e6b75c}
+.btn.gold:disabled{opacity:.4; cursor:not-allowed}
+.btn.ghost{background:none; border-color:#5c5548; color:var(--cream)}
+.btn.ghost:hover{border-color:var(--cream)}
+.linkbtn{background:none; border:none; color:var(--muted); cursor:pointer; text-decoration:underline; padding:0}
+.linkbtn:hover{color:var(--clay)}
+
+.empty{text-align:center; padding:26px 10px; color:var(--muted)}
+.empty p{margin:0 0 14px}
+.feed{list-style:none; margin:0; padding:0}
+.feed li{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px dashed var(--line); font-size:14px}
+.feed li:first-child{border-top:none}
+.fd{color:var(--muted); font-variant-numeric:tabular-nums; font-size:12.5px}
+.ft{flex:1}
+
+.filters{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:16px}
+.filters .btn{width:100%}
+
+.statstrip{display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:12px; margin-bottom:18px}
+.stat{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+.stat .sl{display:block; font-size:12.5px; color:var(--muted)}
+.stat .sv{font-size:21px; font-family:Amiri,Georgia,serif}
+.stat .sv em{font-style:normal; font-size:12px; color:var(--muted)}
+.stat.good{border-inline-start:3px solid var(--green)}
+.stat.warn{border-inline-start:3px solid var(--gold)}
+.stat.bad{border-inline-start:3px solid var(--clay)}
+
+.tablewrap{overflow-x:auto}
+.tbl{width:100%; border-collapse:collapse; font-size:14px; min-width:780px}
+.tbl th{text-align:start; font-weight:600; color:var(--muted); font-size:12.5px; padding:0 10px 10px; border-bottom:1px solid var(--line)}
+.tbl td{padding:11px 10px; border-bottom:1px dashed var(--line); vertical-align:top}
+.tbl tfoot td{border-bottom:none; border-top:1px solid var(--gold); color:var(--gold); font-weight:700}
+.mono{font-variant-numeric:tabular-nums; white-space:nowrap}
+.good{color:var(--green)} .warn{color:var(--gold)} .muted{color:var(--muted)}
+.pill{background:#ffffff0d; border-radius:999px; padding:3px 10px; font-size:12.5px; white-space:nowrap}
+
+.chartgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:16px}
+.chartgrid .panel{margin-bottom:0}
+.cardnote{margin:10px 0 0; font-size:12.5px; color:var(--muted)}
+svg.chart{width:100%; height:auto; display:block}
+.legend{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; font-size:12.5px; color:var(--muted); margin-top:8px}
+.legend i{width:10px; height:10px; border-radius:2px; display:inline-block; margin-inline-end:5px}
+.minitable{width:100%; border-collapse:collapse; font-size:14px}
+.minitable td{padding:9px 4px; border-bottom:1px dashed var(--line)}
+.minitable td:last-child{text-align:end; font-variant-numeric:tabular-nums; color:var(--gold); white-space:nowrap}
+.minitable tr:last-child td{border-bottom:none}
+
+.advgroup{margin-bottom:26px}
+.advhead{font-size:19px; margin-bottom:12px; display:flex; align-items:center; gap:8px}
+.advhead span{font-size:12px; background:#ffffff0d; border-radius:999px; padding:2px 9px; font-family:inherit}
+.advhead.good{color:var(--green)} .advhead.warn{color:var(--gold)} .advhead.bad{color:var(--clay)}
+.advlist{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px}
+.advcard{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px; border-inline-start:3px solid var(--line)}
+.advcard.good{border-inline-start-color:var(--green)}
+.advcard.warn{border-inline-start-color:var(--gold)}
+.advcard.bad{border-inline-start-color:var(--clay)}
+.advcard header{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px}
+.advcard h4{font-size:17px}
+.advtag{font-size:11.5px; color:var(--muted); white-space:nowrap}
+.advcard p{margin:0; font-size:14px}
+.evidence{margin-top:8px; font-size:12.5px; color:var(--gold); font-variant-numeric:tabular-nums}
+
+.modal{position:fixed; inset:0; background:#000000b8; display:flex; align-items:center; justify-content:center; padding:20px; z-index:50}
+.modal[hidden]{display:none}
+.modalbox{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; max-width:680px; width:100%}
+.modalbox h3{font-size:20px; margin-bottom:6px}
+.modalbox textarea{width:100%; height:220px; margin-top:12px; background:var(--field); color:var(--cream);
+  border:1px solid var(--line); border-radius:9px; padding:12px; direction:ltr; text-align:left; font-size:12.5px}
+.toast{position:fixed; inset-inline-start:50%; transform:translateX(-50%); bottom:24px;
+  background:var(--gold); color:#231f1a; font-weight:700; padding:10px 22px; border-radius:999px; z-index:60}
+.toast[hidden]{display:none}
+
+@media (max-width:640px){
+  .sechead h2{font-size:27px}
+  .page{padding:20px 14px 60px}
+  .topbar{padding:12px 14px}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <span class="brand-mark">مزرعتي</span>
+    <span class="brand-sub">مواشي · مشتل · معدات · ورشة حديد · مقاولات زراعية</span>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-tab="entry">إدخال البيانات</button>
+    <button class="tab" data-tab="calendar">التقويم الزراعي</button>
+    <button class="tab" data-tab="reports">التقارير</button>
+    <button class="tab" data-tab="analysis">التحليل</button>
+    <button class="tab" data-tab="advice">الاقتراحات</button>
+  </nav>
+</header>
+
+<main class="page" id="page"></main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modalbox">
+    <h3 id="modalTitle"></h3>
+    <p class="muted" id="modalNote"></p>
+    <textarea id="modalText"></textarea>
+    <div class="actions">
+      <button class="btn gold" data-act="modal-close">إغلاق</button>
+      <button class="btn ghost" data-act="modal-import" id="importBtn" hidden>استيراد البيانات</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ============================================================
+   مزرعتي — الأقسام الخمسة · العملة: الدينار الكويتي
+   HTML + CSS + JavaScript فقط.
+   ============================================================ */
+
+var KWD = "د.ك";
+var STORE_KEY = "mazraati_v3";
+
+var DEPTS = ["المواشي", "المشتل", "المعدات", "ورشة الحديد", "مقاولات زراعية"];
+var DEPTS_ALL = DEPTS.concat(["مشترك"]);
+var DEPT_COLORS = { "المواشي":"#b9663f", "المشتل":"#7d9a63", "المعدات":"#6f8fa6",
+  "ورشة الحديد":"#8a8f98", "مقاولات زراعية":"#d9a441", "مشترك":"#5c5548" };
+var MONTHS_AR = ["","يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+/* ---------- ١ · قسم المواشي ---------- */
+var FLOCK = {
+  "تغذية": { unit:"كجم علف",   hint:"علف ومياه نظيفة يومياً." },
+  "صحة":   { unit:"رأس معالج", hint:"فحوصات وتطعيمات دورية." },
+  "تكاثر": { unit:"مولود",     hint:"متابعة الولادات والتحسين الوراثي." },
+  "رعاية": { unit:"ساعة عمل",  hint:"نظافة الحظائر والمأوى." }
+};
+var LIVE_PRODUCTS = ["أغنام حية", "لحوم", "ألبان", "سماد عضوي"];
+
+/* ---------- ٢ · قسم المشتل ---------- */
+var ZONES = ["بيت محمي 1", "بيت محمي 2", "بيت محمي 3", "الساحة الخارجية", "قسم النخيل"];
+var OPS = {
+  "تجهيز": { unit:"كجم سماد", hint:"تحضير التربة والأسمدة قبل الزراعة." },
+  "ريّ":   { unit:"م³ مياه",  hint:"ريّ منتظم حسب احتياج كل صنف." },
+  "صيانة": { unit:"ساعة عمل", hint:"تقليم ومكافحة آفات ومتابعة يومية." },
+  "حصاد":  { unit:"نبتة",     hint:"جمع المحصول الجاهز للبيع." }
+};
+var NURS_PRODUCTS = ["شتلات خضار", "نباتات زينة", "أشجار ونخيل", "أعشاب", "تربة ومستلزمات", "محصول حقلي"];
+
+/* ---------- ٣ · قسم بيع وتأجير المعدات ---------- */
+var EQUIP_OPS = {
+  "تأجير": { unit:"يوم",      hint:"الإيراد = عدد الأيام × الأجرة اليومية." },
+  "بيع":   { unit:"وحدة",     hint:"الإيراد = الكمية × سعر الوحدة." },
+  "صيانة": { unit:"ساعة عمل", hint:"صيانة داخلية — تكلفة بلا إيراد." }
+};
+var EQUIPMENT = ["جرّار زراعي","حفّار","شيول","صهريج مياه","مضخة ريّ","مولّد كهرباء","مقطورة نقل","رشاش زراعي","معدة أخرى"];
+
+/* ---------- ٤ · قسم ورشة الحديد ----------
+   الأسعار من جدول «ميزانية حضيرة الغنم».
+   السطر الثاني (35 د.ك) كان بلا اسم في الجدول — سُجّل كمقاس ثانٍ من صومعة التسمين.
+   ------------------------------------------------------------ */
+var WORK_PRODUCTS = [
+  { n:"صومعة تسمين",             p:20 },
+  { n:"صومعة تسمين — مقاس ثانٍ", p:35 },
+  { n:"معلف حديد كبير",          p:65 },
+  { n:"معلف حديد صغير",          p:25 },
+  { n:"مكبس عادي",               p:75 },
+  { n:"مكبس مطوّر (بابين)",      p:85 },
+  { n:"أبواب وبوابات",           p:0  },
+  { n:"سواتر وأسوار",            p:0  },
+  { n:"حظائر ومظلات",            p:0  },
+  { n:"هناجر",                   p:0  },
+  { n:"أقفاص ومعالف أخرى",       p:0  },
+  { n:"أعمال حديد مخصصة",        p:0  }
+];
+function workPrice(n){
+  for (var i=0;i<WORK_PRODUCTS.length;i++) if (WORK_PRODUCTS[i].n === n) return WORK_PRODUCTS[i].p;
+  return 0;
+}
+
+/* ---------- ٥ · قسم المقاولات الزراعية ---------- */
+var PROJECTS = ["تجهيز وتسوية أرض","شبكة ريّ","زراعة وتشجير","تنسيق حدائق","تركيب بيوت محمية","صيانة دورية"];
+var PROJECT_STATUS = ["قيد التنفيذ","مكتمل — مستحق التحصيل","مكتمل — محصّل"];
+
+/* ---------- مشترك ---------- */
+var CHANNELS = ["أفراد من المزرعة","مشاتل التجزئة","السوق المحلي","موزّع بشراكة","جهة حكومية","شركة"];
+var EXP_CATS = ["أعلاف","بذور وشتلات","رعاية بيطرية","حديد وخامات","وقود","قطع غيار","كهرباء ومياه","عمالة","إيجارات","نقل","تسويق","أخرى"];
+
+/* ============================================================
+   التقويم الزراعي — من ملف «الشتلات العامة»
+   n المحصول · p موعد الزراعة · s المسافات · q التقاوي للدونم
+   d [أقل,أكثر] أيام حتى الحصاد · m الشهور المناسبة · g إرشادات
+   ============================================================ */
+var CROPS=[
+{n:"طماطم",p:"15 سبتمبر - 15 أكتوبر (خريفي) / شتلات فبراير ومارس (ربيعي) / شتلات في أغسطس",s:"75 × 50 سم",q:"75 - 85 جم",d:[60,120],m:[2,3,9,10,11],g:"ابدأ الشتلات في الداخل/الظل في أغسطس وأكتوبر لتكون جاهزة. تجنب رش الماء على الأوراق."},
+{n:"باذنجان",p:"8 - 9 (خريفي) / 2 (ربيعي)",s:"75 × 50 سم",q:"75 - 150 جم",d:[80,120],m:[2,9,10],g:"تبدأ الشتلات داخل المنزل في الصيف (أغسطس) وتزرع في الخريف."},
+{n:"فلفل",p:"9 (خريفي) / فبراير",s:"75 × 50 سم",q:"75 - 150 جم",d:[60,90],m:[2,9,10,11],g:"ابدأ الشتلات في الظل أو داخل المنزل إذا لم تبدأ بعد."},
+{n:"بطاطس",p:"12 - 11 (خريفي) / 15 أكتوبر - نوفمبر",s:"75 × 30 سم",q:"250 كجم درنات",d:[90,120],m:[10,11,12],g:"تزرع بالدرنات مع تنظيم الري وتجنب زيادة الرطوبة المفرطة."},
+{n:"بطاطا حلوة (فندال)",p:"10 - 9 (خريفي) / 4 - 3 - 2 (ربيعي)",s:"75 × 30 سم",q:"250 كجم درنات",d:[150,180],m:[3,4,9,10],g:"تحتاج لتربة خفيفة ودفء نسبي."},
+{n:"خيار",p:"9 - 8 (خريفي) / 3 - 2 (ربيعي)",s:"50 × 75 سم",q:"250 - 500 جم",d:[40,60],m:[2,3,8,9,10],g:"ينمو بسرعة في الأجواء المعتدلة، يحتاج ري منتظم."},
+{n:"كوسا",p:"9 - 8 (خريفي) / 3 - 2 (ربيعي)",s:"50 × 1 متر",q:"1 - 1.5 كجم",d:[30,60],m:[2,3,9,10],g:"انتبه لعلامات البياض الدقيقي على القرعيات."},
+{n:"قرع (قرع أخضر)",p:"8 (خريفي) / سبتمبر",s:"سطور",q:"3 - 2 كجم",d:[60,90],m:[9,10],g:"يزرع مباشرة في الخارج مع بداية انخفاض الحرارة."},
+{n:"بطيخ (رقي)",p:"8 - 7 (خريفي) / 3 - 2 (ربيعي)",s:"2.5 × 0.8 متر",q:"200 - 400 جم",d:[80,120],m:[2,3,8,9],g:"يحتاج مساحات واسعة وإضاءة ساطع."},
+{n:"شمام (بطيخ أصفر)",p:"8 - 7 (خريفي) / 3 - 2 (ربيعي)",s:"2.5 × 0.8 متر",q:"200 - 400 جم",d:[80,120],m:[2,3,8,9],g:"من محاصيل الصيف المبكر والخريف."},
+{n:"فقوس (طروح)",p:"9 - 8 (خريفي) / 3 - 2 (ربيعي)",s:"50 × 75 سم",q:"250 - 500 جم",d:[45,60],m:[2,3,9,10],g:"يشبه الخيار في ظروف النمو."},
+{n:"خس",p:"11 - 10 (خريفي) / سبتمبر - نوفمبر",s:"15 × 20 سم",q:"120 جم",d:[30,90],m:[1,9,10,11,12],g:"طقس بارد ومثالي للأوراق الخضراء."},
+{n:"سبانخ",p:"11 - 10 (خريفي) / أكتوبر - نوفمبر",s:"75 × 50 سم (أو نثر)",q:"2.5 - 3.5 كجم",d:[60,75],m:[1,9,10,11,12],g:"ينمو بسرعة في الجو المعتدل والبارد."},
+{n:"جرجير",p:"11 - 10 - 9 (خريفي) / 4 - 3 - 2 - 1 (ربيعي)",s:"نثر في سطور",q:"1 - 2 كجم",d:[21,45],m:[1,2,3,9,10,11,12],g:"ينمو بسرعة وسهل الزراعة في التربة مباشرة."},
+{n:"ملفوف (كرنب ملفوف)",p:"10 - 9 (خريفي) / أغسطس - سبتمبر",s:"75 × 50 سم",q:"60 - 90 جم",d:[70,120],m:[9,10,11],g:"يزرع شتلات في الخريف للرؤوس الملفوفة."},
+{n:"ملفوف صيني",p:"أكتوبر - سبتمبر",s:"75 × 50 سم",q:"60 - 90 جم",d:[70,100],m:[9,10],g:"يفضل الأجواء المعتدلة المائلة للبرودة."},
+{n:"كرنب بروكسل",p:"أكتوبر - سبتمبر",s:"75 × 50 سم",q:"60 - 90 جم",d:[90,120],m:[9,10],g:"يحتاج طقساً بارداً."},
+{n:"قرنبيط (زهرة)",p:"10 - 9 (خريفي) / أبريل - مايو أو 15 أغسطس - 15 أكتوبر",s:"75 × 50 سم",q:"60 - 90 جم",d:[80,120],m:[9,10,11],g:"من محاصيل الشتاء والخريف الباردة."},
+{n:"بروكلي",p:"أغسطس (للبدء في الشتلات) / الخريف",s:"75 × 50 سم",q:"60 - 90 جم",d:[80,110],m:[8,9,10],g:"تبدأ الشتلات داخلياً في أغسطس."},
+{n:"سلق",p:"نوفمبر - أكتوبر",s:"نثر في أحواض",q:"1 - 3 كجم",d:[50,70],m:[9,10,11],g:"أوراق خضراء غنية تتحمل البرودة النسبية."},
+{n:"خبيزة",p:"ديسمبر - نوفمبر",s:"نثر في أحواض",q:"1 - 2 كجم",d:[45,60],m:[10,11,12],g:"تنمو جيداً في الطقس البارد."},
+{n:"هندباء",p:"نوفمبر - أكتوبر",s:"نثر",q:"1 كجم",d:[50,70],m:[10,11],g:"من ورقيات الشتاء المفيدة."},
+{n:"جزر",p:"11 - 10 (خريفي)",s:"نثر في أحواض أو على سطور",q:"1 - 3 كجم",d:[60,90],m:[9,10,11,12],g:"يحتاج تربة رملية خفيفة وعميقة."},
+{n:"لفت",p:"11 - 10 (خريفي) / أكتوبر - نوفمبر",s:"نثر في سطور",q:"600 - 1000 جم",d:[40,70],m:[10,11,12],g:"ينمو بسرعة في الأجواء الباردة."},
+{n:"فجل (أحمر وأبيض)",p:"12 - 11 - 10 - 9 / أستر وسبتمبر",s:"نثر في أحواض",q:"2 - 1 كجم",d:[21,45],m:[1,2,3,9,10,11,12],g:"أسرع المحاصيل الجذرية في الحصاد."},
+{n:"شمندر (بنجر)",p:"11 - 10 - 9 (خريفي) / سبتمبر - نوفمبر",s:"75 × 50 سم",q:"1.5 - 1 كجم",d:[60,85],m:[9,10,11,12],g:"يفضل الري المنتظم لعدم تشقق الجذور."},
+{n:"بصل",p:"نوفمبر - أكتوبر",s:"20 × 10 سم",q:"2 - 1 كجم بذور (أو شتلات)",d:[110,140],m:[9,10,11,12],g:"يُزرع بالبذار أو الشتلات في الخريف."},
+{n:"ثوم",p:"نوفمبر - أكتوبر",s:"20 × 10 سم",q:"150 - 180 كجم فصوص",d:[140,180],m:[10,11],g:"تزرع الفصوص المنفردة في التربة مباشرة."},
+{n:"أبو ركبة (كولرابي)",p:"نوفمبر - أكتوبر",s:"75 × 50 سم",q:"1 كجم",d:[60,90],m:[9,10,11],g:"من العوائل الصليبية المفضلة شتاءً."},
+{n:"لخنة (لفت صيني/مفلطح)",p:"نوفمبر - أكتوبر",s:"75 × 50 سم",q:"1 كجم",d:[60,90],m:[9,10,11],g:"تنمو بانتظام في الخريف."},
+{n:"بازلاء (بسلة)",p:"11 - 10 / نوفمبر - ديسمبر",s:"75 × 50 سم",q:"6 - 14 كجم",d:[50,100],m:[1,10,11,12],g:"تثبت النيتروجين في التربة، تحب الجو البارد."},
+{n:"فول (باجلاء)",p:"11 - 10 / أكتوبر",s:"75 × 50 سم",q:"8 - 12 كجم",d:[80,90],m:[10,11],g:"يزرع في بداية الخريف للحصاد الشتوي."},
+{n:"لوبيا",p:"فبراير وسبتمبر",s:"75 × 50 سم",q:"2 - 6 كجم",d:[90,120],m:[2,9],g:"تتحمل درجات الحرارة المعتدلة."},
+{n:"فاصوليا",p:"مارس (ربيعي)",s:"سطور",q:"3 - 2 كجم",d:[45,60],m:[2,3],g:"تزرع في آخر البرد وقبل الصيف."},
+{n:"حمص (نخي)",p:"11 (خريفي)",s:"سطور",q:"كجم",d:[90,120],m:[11],g:"زراعة خريفية شتوية."},
+{n:"ماش",p:"11 (خريفي)",s:"سطور",q:"كجم",d:[80,100],m:[11],g:"محصول بقطاع الحبوب والبقول."},
+{n:"حلبة",p:"12 - 11 (خريفي)",s:"نثر",q:"كجم",d:[60,80],m:[11,12],g:"تُزرع للاستخدام الورقي أو الحبوب."},
+{n:"بقدونس",p:"12 - 11 - 10 - 9 / أكتوبر - نوفمبر",s:"نثر في أحواض",q:"2 - 3 كجم",d:[50,60],m:[9,10,11,12],g:"يحتاج رياً منتظماً وإضاءة جيدة."},
+{n:"كزبرة",p:"12 - 11 - 10 / أكتوبر - نوفمبر",s:"نثر في سطور",q:"2 - 3 كجم",d:[45,60],m:[9,10,11,12],g:"من الأعشاب الشتوية والخريفية سريعة النمو."},
+{n:"شبت (شبت)",p:"11 - 10 / أكتوبر - نوفمبر",s:"نثر في سطور",q:"2 - 3 كجم",d:[45,60],m:[10,11],g:"يفضل الأجواء الباردة."},
+{n:"كرات (بقل)",p:"نوفمبر - أكتوبر",s:"سطور أو أحواض",q:"2 - 3 كجم",d:[60,80],m:[9,10,11],g:"من الورقيات المعمرة أو الموسمية الشتوية."},
+{n:"نعناع",p:"11 - 10 - 9 / ربيع",s:"سطور",q:"الجذور/الشتلات",d:[40,60],m:[9,10,11],g:"يحتاج رطوبة عالية وتربة خصبة."},
+{n:"ملوخية",p:"مارس - أبريل / مارس",s:"نثر في أحواض",q:"1 - 2 كجم",d:[45,60],m:[3,4],g:"تحب الدفء وتبدأ مع الاعتدال الربيعي."},
+{n:"ريحان",p:"سبتمبر / مارس",s:"أحواض منزلية",q:"بذور",d:[30,45],m:[3,9],g:"يزرع في بداية الخريف أو الربيع."},
+{n:"بابونج",p:"ديسمبر - نوفمبر",s:"سطور",q:"بذور",d:[90,120],m:[11,12],g:"من النباتات الطبية الشتوية."},
+{n:"مرامية",p:"ديسمبر - نوفمبر",s:"شتلات",q:"شتلات",d:[0,0],m:[11,12],g:"تتحمل الجفاف النسبي."},
+{n:"ينسون",p:"10",s:"سطور",q:"بذور",d:[100,120],m:[10],g:"يزرع في بداية الاعتدال الخريفي."},
+{n:"قمح",p:"نوفمبر - أكتوبر",s:"نثر أو سطور",q:"15 - 20 كجم",d:[120,150],m:[10,11],g:"محصول حقل شتوي رئيسي."},
+{n:"شعير",p:"نوفمبر - أكتوبر",s:"نثر أو سطور",q:"15 - 20 كجم",d:[110,140],m:[10,11],g:"مقاوم ممتاز للظروف الجافة مقارنة بالقمح."},
+{n:"ذرة صفراء",p:"9 - 8 (خريفي) / 2 (ربيعي)",s:"30 × 25 سم",q:"6 - 7 كجم",d:[70,100],m:[2,8,9],g:"تحتاج إضاءة ساطعة ورياً منتظماً."},
+{n:"ذرة بيضاء / سكانس",p:"أكتوبر - سبتمبر",s:"30 × 25 سم",q:"6 كجم",d:[90,110],m:[9,10],g:"تُزرع للحبوب أو علف حيواني."},
+{n:"برسيم",p:"أكتوبر - سبتمبر",s:"نثر",q:"3 - 4 كجم",d:[0,0],m:[9,10],g:"علف أخضر أساسي ومحسن للتربة."},
+{n:"محصول علفي (بدون اسم)",p:"نوفمبر - أكتوبر",s:"نثر",q:"3 - 4 كجم",d:[0,0],m:[9,10,11],g:"ينمو بكثافة في الأجواء المعتدلة."},
+{n:"فراولة",p:"-10 (خريفي) / شتلات داخلية في الصيف",s:"30 سم",q:"6 آلاف شتلة",d:[100,130],m:[7,9,10],g:"ابدأ الشتلات وخطط لها في يوليو داخل المنزل تحت الإضاءة."},
+{n:"عباد الشمس",p:"سبتمبر / فبراير",s:"سطور",q:"2 - 3 كجم",d:[80,100],m:[2,9],g:"يزرع مباشرة في الخارج مع اعتدال الحرارة."}
+];
+function cropByName(n){ for (var i=0;i<CROPS.length;i++) if (CROPS[i].n === n) return CROPS[i]; return null; }
+function cropsForMonth(m){ return CROPS.filter(function(c){ return c.m.indexOf(m) >= 0; }); }
+
+/* ============================================================
+   أنواع السجلات
+   ============================================================ */
+var KINDS = {
+  livestock: { label:"سجل المواشي", icon:"🐑", dept:"المواشي", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"category", l:"نوع السجل", t:"select", o:Object.keys(FLOCK)},
+    {n:"head", l:"عدد الرؤوس", t:"number", u:"رأس"},
+    {n:"qty", l:"المقدار", t:"number", dyn:function(r){ return (FLOCK[r.category]||{}).unit || "وحدة"; }},
+    {n:"cost", l:"التكلفة", t:"number", u:KWD},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  planting: { label:"زراعة محصول", icon:"🌱", dept:"المشتل", fields:[
+    {n:"date", l:"تاريخ الزراعة", t:"date"},
+    {n:"crop", l:"المحصول", t:"select", o:CROPS.map(function(c){ return c.n; })},
+    {n:"zone", l:"الموقع", t:"select", o:ZONES},
+    {n:"area", l:"المساحة", t:"number", u:"دونم"},
+    {n:"qty", l:"عدد الشتلات", t:"number", u:"شتلة"},
+    {n:"cost", l:"تكلفة الزراعة", t:"number", u:KWD},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  nurseryOps: { label:"عملية زراعية", icon:"🚿", dept:"المشتل", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"opType", l:"نوع العملية", t:"select", o:Object.keys(OPS)},
+    {n:"zone", l:"الموقع", t:"select", o:ZONES},
+    {n:"qty", l:"المقدار", t:"number", dyn:function(r){ return (OPS[r.opType]||{}).unit || "وحدة"; }},
+    {n:"cost", l:"التكلفة", t:"number", u:KWD},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  equipment: { label:"بيع وتأجير المعدات", icon:"🚜", dept:"المعدات", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"opType", l:"نوع الحركة", t:"select", o:Object.keys(EQUIP_OPS)},
+    {n:"equipment", l:"المعدة", t:"select", o:EQUIPMENT},
+    {n:"customer", l:"العميل", t:"text"},
+    {n:"qty", l:"المقدار", t:"number", dyn:function(r){ return (EQUIP_OPS[r.opType]||{}).unit || "وحدة"; }},
+    {n:"price", l:"سعر الوحدة", t:"number", u:KWD},
+    {n:"cost", l:"التكلفة", t:"number", u:KWD},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  workshop: { label:"ورشة الحديد", icon:"🔩", dept:"ورشة الحديد", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"product", l:"المنتج", t:"select", o:WORK_PRODUCTS.map(function(p){ return p.n; })},
+    {n:"customer", l:"العميل", t:"text"},
+    {n:"qty", l:"العدد", t:"number", u:"قطعة"},
+    {n:"weight", l:"وزن الحديد للقطعة", t:"number", u:"كجم"},
+    {n:"price", l:"سعر القطعة", t:"number", u:KWD},
+    {n:"cost", l:"خامات وعمالة", t:"number", u:KWD},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  contract: { label:"مقاولات زراعية", icon:"🏗️", dept:"مقاولات زراعية", fields:[
+    {n:"date", l:"تاريخ العقد", t:"date"},
+    {n:"project", l:"نوع المشروع", t:"select", o:PROJECTS},
+    {n:"customer", l:"العميل", t:"text"},
+    {n:"area", l:"المساحة", t:"number", u:"م²"},
+    {n:"value", l:"قيمة العقد", t:"number", u:KWD},
+    {n:"cost", l:"تكاليف التنفيذ", t:"number", u:KWD},
+    {n:"status", l:"حالة العقد", t:"select", o:PROJECT_STATUS},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  sales: { label:"مبيعات مواشي ومشتل", icon:"📈", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"dept", l:"القسم", t:"select", o:["المواشي","المشتل"]},
+    {n:"product", l:"المنتج", t:"select", o:LIVE_PRODUCTS.concat(NURS_PRODUCTS)},
+    {n:"channel", l:"قناة البيع", t:"select", o:CHANNELS},
+    {n:"customer", l:"العميل", t:"text"},
+    {n:"qty", l:"الكمية", t:"number", u:"وحدة"},
+    {n:"price", l:"سعر الوحدة", t:"number", u:KWD},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]},
+  expense: { label:"مصروف", icon:"🧾", fields:[
+    {n:"date", l:"التاريخ", t:"date"},
+    {n:"category", l:"بند المصروف", t:"select", o:EXP_CATS},
+    {n:"dept", l:"القسم", t:"select", o:DEPTS_ALL},
+    {n:"cost", l:"المبلغ", t:"number", u:KWD},
+    {n:"note", l:"ملاحظة", t:"text", wide:true}
+  ]}
+};
+
+/* ============================================================
+   أدوات
+   ============================================================ */
+var NF = new Intl.NumberFormat("en-US", { maximumFractionDigits:1 });
+var MF = new Intl.NumberFormat("en-US", { minimumFractionDigits:3, maximumFractionDigits:3 });
+function num(v){ v = parseFloat(v); return isFinite(v) ? v : 0; }
+function fmt(v){ return NF.format(num(v)); }
+function money(v){ return MF.format(num(v)); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function monthOf(d){ return (d||"").slice(0,7); }
+function daysSince(d){ return (Date.now() - new Date(d).getTime()) / 86400000; }
+function addDays(d, n){ return new Date(new Date(d).getTime() + n*86400000).toISOString().slice(0,10); }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+
+function deptOf(r){ return KINDS[r.kind].dept || r.dept || "مشترك"; }
+function revenueOf(r){
+  if (r.kind === "sales" || r.kind === "workshop") return num(r.qty) * num(r.price);
+  if (r.kind === "equipment") return r.opType === "صيانة" ? 0 : num(r.qty) * num(r.price);
+  if (r.kind === "contract") return r.status === "قيد التنفيذ" ? 0 : num(r.value);
+  return 0;
+}
+function costOf(r){ return num(r.cost); }
+function unitOf(rec, f){ return f.dyn ? f.dyn(rec) : (f.u || ""); }
+
+/* ---------- الحالة والتخزين ---------- */
+var state = { tab:"entry", records:[], kind:"livestock",
+  filters:{ kind:"all", dept:"all", from:"", to:"", q:"" }, cq:"" };
+
+function save(){
+  try { if (window.storage) window.storage.set(STORE_KEY, JSON.stringify(state.records));
+        else localStorage.setItem(STORE_KEY, JSON.stringify(state.records)); } catch(e){}
+}
+function load(cb){
+  try {
+    if (window.storage){
+      window.storage.get(STORE_KEY).then(function(res){
+        if (res && res.value) try { state.records = JSON.parse(res.value) || []; } catch(e){}
+        cb();
+      })["catch"](function(){ cb(); });
+      return;
+    }
+    var v = localStorage.getItem(STORE_KEY);
+    if (v) state.records = JSON.parse(v) || [];
+  } catch(e){}
+  cb();
+}
+function addRecord(r){ state.records.unshift(r); save(); }
+function delRecord(id){
+  state.records = state.records.filter(function(r){ return r.id !== id; });
+  save(); render(); toast("تم حذف السجل");
+}
+var toastTimer = null;
+function toast(msg){
+  var el = document.getElementById("toast");
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(function(){ el.hidden = true; }, 2600);
+}
+
+/* ---------- وصف السجل ---------- */
+function describe(r){
+  function u(name){
+    var fs = KINDS[r.kind].fields, fd = null, i;
+    for (i=0;i<fs.length;i++) if (fs[i].n === name) fd = fs[i];
+    return fd ? unitOf(r, fd) : "";
+  }
+  switch(r.kind){
+    case "livestock":  return r.category+" — "+fmt(r.qty)+" "+u("qty")+" لـ "+fmt(r.head)+" رأس";
+    case "planting":   return "زراعة "+r.crop+" — "+fmt(r.qty)+" شتلة على "+fmt(r.area)+" دونم في "+r.zone;
+    case "nurseryOps": return r.opType+" — "+fmt(r.qty)+" "+u("qty")+" في "+r.zone;
+    case "equipment":  return r.opType+" "+r.equipment+" — "+fmt(r.qty)+" "+u("qty")+(r.customer?" · "+r.customer:"");
+    case "workshop":   return r.product+" — "+fmt(r.qty)+" قطعة"+(num(r.weight)?" ("+fmt(num(r.weight)*num(r.qty))+" كجم حديد)":"")+(r.customer?" · "+r.customer:"");
+    case "contract":   return r.project+" — "+fmt(r.area)+" م² · "+r.status+(r.customer?" · "+r.customer:"");
+    case "sales":      return "بيع "+r.product+" — "+fmt(r.qty)+" وحدة عبر "+r.channel;
+    case "expense":    return r.category+" ("+r.dept+") — "+money(r.cost)+" "+KWD;
+  }
+  return "";
+}
+
+/* ============================================================
+   محرّك التحليل
+   ============================================================ */
+function analyze(recs){
+  var rev = 0, cost = 0, months = {}, i;
+  for (i=0;i<recs.length;i++){ rev += revenueOf(recs[i]); cost += costOf(recs[i]); }
+
+  recs.forEach(function(r){
+    var m = monthOf(r.date); if (!m) return;
+    if (!months[m]) months[m] = { m:m, rev:0, cost:0 };
+    months[m].rev += revenueOf(r); months[m].cost += costOf(r);
+  });
+  var monthly = Object.keys(months).sort().slice(-12).map(function(k){
+    var x = months[k];
+    return { m:x.m.slice(5)+"/"+x.m.slice(2,4), rev:Math.round(x.rev), cost:Math.round(x.cost) };
+  });
+
+  var dep = {};
+  DEPTS_ALL.forEach(function(d){ dep[d] = { name:d, rev:0, cost:0 }; });
+  recs.forEach(function(r){
+    var d = deptOf(r); if (!dep[d]) dep[d] = { name:d, rev:0, cost:0 };
+    dep[d].rev += revenueOf(r); dep[d].cost += costOf(r);
+  });
+  var byDept = DEPTS_ALL.map(function(d){
+    var x = dep[d];
+    return { name:d, rev:x.rev, cost:x.cost, net:x.rev-x.cost, margin: x.rev ? ((x.rev-x.cost)/x.rev)*100 : null };
+  }).filter(function(x){ return x.rev || x.cost; });
+  var revByDept = byDept.filter(function(x){ return x.rev > 0; })
+    .map(function(x){ return { name:x.name, value:Math.round(x.rev) }; }).sort(function(a,b){ return b.value-a.value; });
+  var netByDept = byDept.map(function(x){ return { name:x.name, value:Math.round(x.net) }; })
+    .sort(function(a,b){ return b.value-a.value; });
+
+  var cust = {};
+  recs.forEach(function(r){
+    var v = revenueOf(r); if (!v || !r.customer) return;
+    var n = String(r.customer).trim(); if (!n) return;
+    cust[n] = (cust[n]||0) + v;
+  });
+  var byCustomer = Object.keys(cust).map(function(k){ return { name:k, value:Math.round(cust[k]) }; })
+    .sort(function(a,b){ return b.value-a.value; }).slice(0,6);
+
+  /* المعدات */
+  var eq = {}, rentRev = 0, rentDays = 0, maintCost = 0, sellRev = 0;
+  recs.filter(function(r){ return r.kind === "equipment"; }).forEach(function(r){
+    if (!eq[r.equipment]) eq[r.equipment] = { name:r.equipment, days:0, rev:0, cost:0, last:null };
+    var e = eq[r.equipment]; e.cost += costOf(r);
+    if (r.opType === "تأجير"){ e.days += num(r.qty); e.rev += revenueOf(r);
+      rentDays += num(r.qty); rentRev += revenueOf(r);
+      if (e.last === null || r.date > e.last) e.last = r.date; }
+    else if (r.opType === "بيع"){ e.rev += revenueOf(r); sellRev += revenueOf(r); }
+    else maintCost += costOf(r);
+  });
+  var equipList = Object.keys(eq).map(function(k){ return eq[k]; }).sort(function(a,b){ return b.days-a.days; });
+  var equipDays = equipList.filter(function(e){ return e.days > 0; })
+    .map(function(e){ return { name:e.name, value:Math.round(e.days) }; });
+
+  /* الورشة */
+  var wRev = 0, wCost = 0, wKg = 0, wPieces = 0, wProd = {};
+  recs.filter(function(r){ return r.kind === "workshop"; }).forEach(function(r){
+    wRev += revenueOf(r); wCost += costOf(r);
+    wKg += num(r.weight)*num(r.qty); wPieces += num(r.qty);
+    if (!wProd[r.product]) wProd[r.product] = { name:r.product, qty:0, rev:0, cost:0 };
+    wProd[r.product].qty += num(r.qty);
+    wProd[r.product].rev += revenueOf(r);
+    wProd[r.product].cost += costOf(r);
+  });
+  var workProducts = Object.keys(wProd).map(function(k){ return wProd[k]; })
+    .sort(function(a,b){ return b.rev-a.rev; });
+  var workQty = workProducts.map(function(p){ return { name:p.name, value:Math.round(p.qty) }; });
+
+  /* المقاولات */
+  var cOpen = 0, cOpenVal = 0, cDue = 0, cDueVal = 0, cDone = 0, cArea = 0, oldest = null;
+  recs.filter(function(r){ return r.kind === "contract"; }).forEach(function(r){
+    cArea += num(r.area);
+    if (r.status === "قيد التنفيذ"){ cOpen++; cOpenVal += num(r.value);
+      if (oldest === null || r.date < oldest) oldest = r.date; }
+    else if (r.status === "مكتمل — مستحق التحصيل"){ cDue++; cDueVal += num(r.value); }
+    else cDone++;
+  });
+
+  /* المشتل والمحاصيل */
+  var zoneMap = {}, cropMap = {}, upcoming = [], late = [];
+  recs.filter(function(r){ return r.kind === "planting"; }).forEach(function(r){
+    zoneMap[r.zone] = (zoneMap[r.zone]||0) + num(r.qty);
+    cropMap[r.crop] = (cropMap[r.crop]||0) + num(r.qty);
+    var c = cropByName(r.crop); if (!c || !c.d[0]) return;
+    var ready = addDays(r.date, c.d[0]), latest = addDays(r.date, c.d[1] || c.d[0]);
+    var left = Math.round((new Date(ready) - Date.now())/86400000);
+    var item = { crop:r.crop, zone:r.zone, qty:num(r.qty), planted:r.date, ready:ready, latest:latest, left:left };
+    if (left >= 0 && left <= 30) upcoming.push(item);
+    else if (left < 0 && daysSince(latest) < 30) late.push(item);
+  });
+  upcoming.sort(function(a,b){ return a.left-b.left; });
+  var byZone = Object.keys(zoneMap).map(function(k){ return { name:k, value:zoneMap[k] }; })
+    .sort(function(a,b){ return b.value-a.value; });
+  var byCrop = Object.keys(cropMap).map(function(k){ return { name:k, value:Math.round(cropMap[k]) }; })
+    .sort(function(a,b){ return b.value-a.value; }).slice(0,8);
+
+  var planted = recs.filter(function(r){ return r.kind === "planting"; })
+    .reduce(function(s,r){ return s+num(r.qty); },0);
+  var soldNursery = recs.filter(function(r){ return r.kind === "sales" && r.dept === "المشتل"; })
+    .reduce(function(s,r){ return s+num(r.qty); },0);
+  var water = recs.filter(function(r){ return r.kind === "nurseryOps" && r.opType === "ريّ"; })
+    .reduce(function(s,r){ return s+num(r.qty); },0);
+  var areaPlanted = recs.filter(function(r){ return r.kind === "planting"; })
+    .reduce(function(s,r){ return s+num(r.area); },0);
+
+  /* زراعة خارج الموسم */
+  var offSeason = recs.filter(function(r){
+    if (r.kind !== "planting") return false;
+    var c = cropByName(r.crop); if (!c || !c.m.length) return false;
+    return c.m.indexOf(parseInt(r.date.slice(5,7),10)) < 0;
+  });
+
+  return {
+    rev:rev, cost:cost, net:rev-cost, margin: rev ? ((rev-cost)/rev)*100 : 0,
+    monthly:monthly, byDept:byDept, revByDept:revByDept, netByDept:netByDept, byCustomer:byCustomer,
+    equipList:equipList, equipDays:equipDays, rentRev:rentRev, rentDays:rentDays, maintCost:maintCost, sellRev:sellRev,
+    wRev:wRev, wCost:wCost, wKg:wKg, wPieces:wPieces, workProducts:workProducts, workQty:workQty,
+    cOpen:cOpen, cOpenVal:cOpenVal, cDue:cDue, cDueVal:cDueVal, cDone:cDone, cArea:cArea, oldestOpen:oldest,
+    byZone:byZone, byCrop:byCrop, planted:planted, soldNursery:soldNursery, water:water, areaPlanted:areaPlanted,
+    upcoming:upcoming, late:late, offSeason:offSeason
+  };
+}
+
+/* ============================================================
+   رسوم SVG مكتوبة يدوياً
+   ============================================================ */
+var W = 480, H = 250, PL = 12, PR = 58, PT = 14, PB = 30;
+function niceMax(v){
+  if (!(v>0)) return 10;
+  var p = Math.pow(10, Math.floor(Math.log10(v))), n = v/p;
+  return (n<=1?1:n<=2?2:n<=5?5:10)*p;
+}
+function svgOpen(){ return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" role="img">'; }
+function gridY(max){
+  var out = "", i, y, v;
+  for (i=0;i<=4;i++){
+    y = PT + (H-PT-PB)*(i/4); v = max - max*(i/4);
+    out += '<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="#3a3630" stroke-dasharray="3 3"/>'
+         + '<text x="'+(W-PR+6)+'" y="'+(y+4)+'" fill="#a49c8c" font-size="10">'+NF.format(Math.round(v))+'</text>';
+  }
+  return out;
+}
+function groupedBars(data, series){
+  if (!data.length) return emptyChart();
+  var d = data.slice().reverse(), max = 0;
+  d.forEach(function(row){ series.forEach(function(s){ max = Math.max(max, num(row[s.key])); }); });
+  max = niceMax(max);
+  var plotW = W-PL-PR, plotH = H-PT-PB, step = plotW/d.length, bw = Math.min(20,(step-10)/series.length);
+  var out = svgOpen() + gridY(max);
+  d.forEach(function(row,i){
+    var cx = PL + step*i + step/2;
+    series.forEach(function(s,j){
+      var v = num(row[s.key]), h = (v/max)*plotH, x = cx - (series.length*bw)/2 + j*bw;
+      out += '<rect x="'+x.toFixed(1)+'" y="'+(PT+plotH-h).toFixed(1)+'" width="'+(bw-2)+'" height="'+Math.max(0,h).toFixed(1)+'" fill="'+s.color+'" rx="2">'
+           + '<title>'+esc(row.m+" · "+s.label+" "+NF.format(v))+'</title></rect>';
+    });
+    out += '<text x="'+cx+'" y="'+(H-10)+'" fill="#a49c8c" font-size="10" text-anchor="middle">'+esc(row.m)+'</text>';
+  });
+  return out + '</svg>' + legend(series);
+}
+function hBars(data, color, unit, signed){
+  if (!data.length) return emptyChart();
+  var max = niceMax(Math.max.apply(null, data.map(function(x){ return Math.abs(x.value); })));
+  var labelW = 122, rowH = Math.min(36,(H-PT-10)/data.length), barMax = W-labelW-58;
+  var out = svgOpen();
+  data.forEach(function(row,i){
+    var y = PT + i*rowH, w = (Math.abs(row.value)/max)*barMax;
+    var c = signed && row.value < 0 ? "#b9663f" : color;
+    out += '<text x="'+(W-6)+'" y="'+(y+rowH/2+4)+'" fill="#e8e1d1" font-size="11" text-anchor="end">'+esc(row.name)+'</text>'
+         + '<rect x="'+(W-labelW-w).toFixed(1)+'" y="'+(y+4)+'" width="'+Math.max(0,w).toFixed(1)+'" height="'+Math.max(6,rowH-12)+'" fill="'+c+'" rx="2">'
+         + '<title>'+esc(row.name+" · "+NF.format(row.value)+" "+unit)+'</title></rect>'
+         + '<text x="'+(W-labelW-w-6).toFixed(1)+'" y="'+(y+rowH/2+4)+'" fill="#a49c8c" font-size="10" text-anchor="end">'+NF.format(row.value)+'</text>';
+  });
+  return out + '</svg>';
+}
+function donut(data, colors){
+  var total = data.reduce(function(s,x){ return s+x.value; },0);
+  if (!total) return emptyChart();
+  var cx = W/2, cy = H/2, r = 86, ri = 50, a0 = -Math.PI/2, out = svgOpen();
+  data.forEach(function(row,i){
+    var a1 = a0 + (row.value/total)*Math.PI*2, large = (a1-a0) > Math.PI ? 1 : 0;
+    var p = ["M",(cx+r*Math.cos(a0)).toFixed(2),(cy+r*Math.sin(a0)).toFixed(2),
+      "A",r,r,0,large,1,(cx+r*Math.cos(a1)).toFixed(2),(cy+r*Math.sin(a1)).toFixed(2),
+      "L",(cx+ri*Math.cos(a1)).toFixed(2),(cy+ri*Math.sin(a1)).toFixed(2),
+      "A",ri,ri,0,large,0,(cx+ri*Math.cos(a0)).toFixed(2),(cy+ri*Math.sin(a0)).toFixed(2),"Z"].join(" ");
+    out += '<path d="'+p+'" fill="'+colors[i%colors.length]+'" stroke="#2a2622" stroke-width="1">'
+         + '<title>'+esc(row.name+" · "+money(row.value)+" "+KWD+" ("+NF.format(row.value/total*100)+"%)")+'</title></path>';
+    a0 = a1;
+  });
+  out += '<text x="'+cx+'" y="'+(cy+5)+'" fill="#e8e1d1" font-size="14" text-anchor="middle">'+NF.format(Math.round(total))+' '+KWD+'</text>';
+  return out + '</svg>' + legend(data.map(function(row,i){
+    return { label:row.name+" "+NF.format(row.value/total*100)+"%", color:colors[i%colors.length] };
+  }));
+}
+function legend(series){
+  return '<div class="legend">' + series.map(function(s){
+    return '<span><i style="background:'+s.color+'"></i>'+esc(s.label)+'</span>'; }).join("") + '</div>';
+}
+function emptyChart(){ return '<div class="empty"><p>لا توجد بيانات كافية لهذا الرسم.</p></div>'; }
+
+/* ============================================================
+   عناصر مشتركة
+   ============================================================ */
+function sechead(e,t,l){ return '<div class="sechead"><span class="eyebrow">— '+e+'</span><h2>'+t+'</h2><p>'+l+'</p></div>'; }
+function stat(l,v,s,tone){ return '<div class="stat '+(tone||"")+'"><span class="sl">'+l+'</span><b class="sv">'+v+(s?' <em>'+s+'</em>':'')+'</b></div>'; }
+function card(t,b,n){ return '<section class="panel"><div class="panel-head"><h3>'+t+'</h3></div>'+b+(n?'<p class="cardnote">'+n+'</p>':'')+'</section>'; }
+function row2(a,b){ return '<tr><td>'+a+'</td><td>'+b+'</td></tr>'; }
+
+/* ============================================================
+   ١) إدخال البيانات
+   ============================================================ */
+function pageEntry(){
+  var k = KINDS[state.kind];
+  var html = sechead("سجل اليوم","إدخال البيانات",
+    "كل حركة في الأقسام الخمسة تُسجَّل هنا مرة واحدة، وتظهر تلقائياً في التقارير والتحليل والاقتراحات.");
+
+  html += '<div class="kindrow">' + Object.keys(KINDS).map(function(key){
+    return '<button class="kindchip'+(state.kind===key?" on":"")+'" data-act="kind" data-kind="'+key+'">'
+         + KINDS[key].icon+' '+KINDS[key].label+'</button>'; }).join("") + '</div>';
+
+  html += '<div class="panel"><div class="panel-head"><h3>'+k.icon+' '+k.label+'</h3>'
+        + '<span class="panel-tag">'+(k.dept || "متعدد الأقسام")+'</span></div><div class="formgrid" id="form">';
+
+  var seed = {}; k.fields.forEach(function(x){ if (x.t==="select") seed[x.n] = x.o[0]; });
+  k.fields.forEach(function(f){
+    var unit = unitOf(seed, f);
+    html += '<label class="field'+(f.wide?" wide":"")+'"><span class="flabel">'+f.l
+          + (unit ? '<em class="unit" data-unit="'+f.n+'">'+unit+'</em>' : '') + '</span>';
+    if (f.t === "select"){
+      html += '<select data-name="'+f.n+'">' + f.o.map(function(o){
+        return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join("") + '</select>';
+    } else {
+      html += '<input type="'+(f.t==="number"?"number":f.t==="date"?"date":"text")+'" data-name="'+f.n+'"'
+            + (f.t==="date" ? ' value="'+today()+'"' : '')
+            + (f.t==="number" ? ' min="0" step="any"' : '')
+            + (f.t==="text" ? ' placeholder="'+(f.n==="customer"?"اسم العميل":"اختياري")+'"' : '') + '>';
+    }
+    html += '</label>';
+  });
+  html += '</div><div class="cropinfo" id="cropInfo" hidden></div>'
+        + '<p class="hint" id="formHint"></p><p class="err" id="formErr" hidden></p>'
+        + '<div class="actions"><button class="btn gold" data-act="save">حفظ السجل</button>'
+        + '<button class="btn ghost" data-act="clear">تفريغ الحقول</button></div></div>';
+
+  var recent = state.records.slice(0,8);
+  html += '<div class="panel"><div class="panel-head"><h3>آخر ما أُدخل</h3>'
+        + '<span class="panel-tag">'+state.records.length+' سجل</span></div>';
+  if (!recent.length){
+    html += '<div class="empty"><p>لا توجد سجلات بعد. ابدأ بإدخال أول حركة، أو جرّب التطبيق ببيانات جاهزة.</p>'
+          + '<button class="btn ghost" data-act="demo">تعبئة بيانات تجريبية</button></div>';
+  } else {
+    html += '<ul class="feed">' + recent.map(function(r){
+      return '<li><span>'+KINDS[r.kind].icon+'</span><span class="fd">'+esc(r.date)+'</span>'
+           + '<span class="ft">'+esc(describe(r))+'</span>'
+           + '<button class="linkbtn" data-act="del" data-id="'+r.id+'">حذف</button></li>'; }).join("") + '</ul>';
+  }
+  html += '</div>';
+
+  html += '<div class="panel"><div class="panel-head"><h3>نسخة احتياطية</h3>'
+        + '<span class="panel-tag">تصدير واستيراد كل السجلات</span></div>'
+        + '<p class="hint">احتفظ بنسخة من بياناتك أو انقلها إلى جهاز آخر عبر ملف نصي.</p>'
+        + '<div class="actions"><button class="btn ghost" data-act="export-json">تصدير نسخة</button>'
+        + '<button class="btn ghost" data-act="import-json">استيراد نسخة</button>'
+        + '<button class="btn ghost" data-act="wipe">حذف كل البيانات</button></div></div>';
+  return html;
+}
+
+function readForm(){
+  var rec = { kind:state.kind }, nodes = document.querySelectorAll("#form [data-name]"), i;
+  for (i=0;i<nodes.length;i++) rec[nodes[i].getAttribute("data-name")] = nodes[i].value;
+  rec.id = uid();
+  return rec;
+}
+function setField(name, value){
+  var el = document.querySelector('#form [data-name="'+name+'"]');
+  if (el && !el.value) el.value = value;
+}
+function refreshDynamic(){
+  var k = KINDS[state.kind], cur = readForm();
+  k.fields.forEach(function(f){
+    if (!f.dyn) return;
+    var el = document.querySelector('[data-unit="'+f.n+'"]');
+    if (el) el.textContent = unitOf(cur, f);
+  });
+
+  /* بطاقة معلومات المحصول */
+  var box = document.getElementById("cropInfo");
+  if (box){
+    if (state.kind === "planting"){
+      var c = cropByName(cur.crop);
+      if (c){
+        var m = parseInt((cur.date||today()).slice(5,7),10);
+        var inSeason = c.m.indexOf(m) >= 0;
+        var ready = cur.date ? addDays(cur.date, c.d[0]) : "";
+        var latest = cur.date ? addDays(cur.date, c.d[1]||c.d[0]) : "";
+        box.innerHTML = '<dl>'
+          + '<div><dt>موعد الزراعة</dt><dd>'+esc(c.p || "—")+'</dd></div>'
+          + '<div><dt>مسافات الزراعة</dt><dd>'+esc(c.s || "—")+'</dd></div>'
+          + '<div><dt>التقاوي للدونم</dt><dd>'+esc(c.q || "—")+'</dd></div>'
+          + '<div><dt>أيام حتى الحصاد</dt><dd>'+(c.d[0] ? c.d[0]+" - "+c.d[1]+" يوم" : "—")+'</dd></div>'
+          + (ready && c.d[0] ? '<div><dt>الحصاد المتوقع</dt><dd>'+ready+' إلى '+latest+'</dd></div>' : '')
+          + '</dl>'
+          + (c.g ? '<p class="hint">'+esc(c.g)+'</p>' : '')
+          + '<p class="season '+(inSeason?"ok":"no")+'">'
+          + (inSeason ? "✔ "+MONTHS_AR[m]+" ضمن الموسم المناسب لهذا المحصول."
+                      : "⚠ "+MONTHS_AR[m]+" خارج الموسم. الشهور المناسبة: "
+                        + c.m.map(function(x){ return MONTHS_AR[x]; }).join("، "))
+          + '</p>';
+        box.hidden = false;
+      } else box.hidden = true;
+    } else box.hidden = true;
+  }
+
+  /* تعبئة سعر منتج الورشة تلقائياً */
+  if (state.kind === "workshop"){
+    var p = workPrice(cur.product);
+    var pe = document.querySelector('#form [data-name="price"]');
+    if (pe && p > 0 && (pe.value === "" || pe.getAttribute("data-auto") === "1")){
+      pe.value = p; pe.setAttribute("data-auto","1"); cur.price = p;
+    }
+  }
+
+  var hint = document.getElementById("formHint"); if (!hint) return;
+  var t = "";
+  if (state.kind === "nurseryOps" && OPS[cur.opType]) t = OPS[cur.opType].hint;
+  else if (state.kind === "livestock" && FLOCK[cur.category]) t = FLOCK[cur.category].hint;
+  else if (state.kind === "equipment" && EQUIP_OPS[cur.opType]){
+    t = EQUIP_OPS[cur.opType].hint;
+    if (cur.opType !== "صيانة") t += "  الإيراد: "+money(num(cur.qty)*num(cur.price))+" "+KWD;
+  }
+  else if (state.kind === "workshop"){
+    var lp = workPrice(cur.product);
+    t = (lp > 0 ? "سعر القائمة "+money(lp)+" "+KWD+" · " : "")
+      + "قيمة العمل: "+money(num(cur.qty)*num(cur.price))+" "+KWD
+      + " · الربح: "+money(num(cur.qty)*num(cur.price)-num(cur.cost))+" "+KWD;
+  }
+  else if (state.kind === "contract") t = cur.status === "قيد التنفيذ"
+    ? "العقد قيد التنفيذ — لا تُحتسب قيمته ضمن الإيرادات حتى يكتمل."
+    : "الربح من العقد: "+money(num(cur.value)-num(cur.cost))+" "+KWD;
+  else if (state.kind === "sales") t = "قيمة هذه المبيعة: "+money(num(cur.qty)*num(cur.price))+" "+KWD;
+  hint.textContent = t;
+}
+function submitForm(){
+  var rec = readForm(), err = document.getElementById("formErr"), msg = "";
+  var hasQty = KINDS[state.kind].fields.some(function(f){ return f.n === "qty"; });
+  if (!rec.date) msg = "أدخل التاريخ قبل الحفظ.";
+  else if (hasQty && num(rec.qty) <= 0) msg = "أدخل مقداراً أكبر من صفر.";
+  else if (state.kind === "expense" && num(rec.cost) <= 0) msg = "أدخل مبلغ المصروف.";
+  else if (state.kind === "contract" && num(rec.value) <= 0) msg = "أدخل قيمة العقد.";
+  else if ((state.kind === "sales" || state.kind === "workshop") && num(rec.price) <= 0) msg = "أدخل السعر.";
+  else if (state.kind === "equipment" && rec.opType !== "صيانة" && num(rec.price) <= 0) msg = "أدخل الأجرة أو سعر البيع.";
+  if (msg){ err.textContent = msg; err.hidden = false; return; }
+  err.hidden = true; addRecord(rec); render(); toast("تم حفظ السجل");
+}
+
+/* ============================================================
+   ٢) التقويم الزراعي
+   ============================================================ */
+function pageCalendar(){
+  var a = analyze(state.records);
+  var m = new Date().getMonth()+1;
+  var nextM = m === 12 ? 1 : m+1;
+  var nowList = cropsForMonth(m), nextList = cropsForMonth(nextM);
+
+  var html = sechead("دليل الزراعة","التقويم الزراعي",
+    CROPS.length+" محصولاً بمواعيد الزراعة ومسافاتها وكميات التقاوي وعدد الأيام حتى الحصاد.");
+
+  html += '<div class="statstrip">'
+    + stat("محاصيل تُزرع في "+MONTHS_AR[m], NF.format(nowList.length), "محصول", "good")
+    + stat("محاصيل "+MONTHS_AR[nextM], NF.format(nextList.length), "محصول")
+    + stat("حصاد خلال 30 يوماً", NF.format(a.upcoming.length), "زراعة", a.upcoming.length?"warn":"")
+    + stat("تجاوز موعد الحصاد", NF.format(a.late.length), "زراعة", a.late.length?"bad":"good")
+    + '</div>';
+
+  /* الحصاد القادم من السجلات الفعلية */
+  if (a.upcoming.length || a.late.length){
+    html += '<div class="panel"><div class="panel-head"><h3>مواعيد الحصاد من زراعاتك</h3>'
+      + '<span class="panel-tag">محسوبة من تاريخ الزراعة</span></div><div class="tablewrap"><table class="tbl">'
+      + '<thead><tr><th>المحصول</th><th>الموقع</th><th>تاريخ الزراعة</th><th>الحصاد المتوقع</th><th>المتبقي</th><th>الشتلات</th></tr></thead><tbody>'
+      + a.late.concat(a.upcoming).map(function(x){
+          return '<tr><td>'+esc(x.crop)+'</td><td>'+esc(x.zone)+'</td>'
+            + '<td class="mono">'+x.planted+'</td><td class="mono">'+x.ready+'</td>'
+            + '<td class="mono '+(x.left<0?"warn":"good")+'">'+(x.left<0 ? "متأخر "+Math.abs(x.left)+" يوم" : x.left+" يوم")+'</td>'
+            + '<td class="mono">'+fmt(x.qty)+'</td></tr>'; }).join("")
+      + '</tbody></table></div></div>';
+  }
+
+  html += '<div class="panel"><div class="panel-head"><h3>يُزرع الآن — '+MONTHS_AR[m]+'</h3>'
+    + '<span class="panel-tag">'+nowList.length+' محصول</span></div>'
+    + '<div class="kindrow">' + nowList.map(function(c){
+        return '<span class="kindchip">'+esc(c.n)+'</span>'; }).join("") + '</div></div>';
+
+  html += '<div class="panel"><div class="panel-head"><h3>جدول المحاصيل الكامل</h3>'
+    + '<span class="panel-tag">بحث بالاسم أو الشهر</span></div>'
+    + '<div class="filters"><label class="field"><span class="flabel">بحث</span>'
+    + '<input type="text" data-cq="1" placeholder="طماطم، أكتوبر، قمح…" value="'+esc(state.cq)+'"></label></div>';
+
+  var list = CROPS.filter(function(c){
+    if (!state.cq) return true;
+    return c.n.indexOf(state.cq) >= 0 || (c.p||"").indexOf(state.cq) >= 0
+      || c.m.some(function(x){ return MONTHS_AR[x].indexOf(state.cq) >= 0; });
+  });
+  if (!list.length) html += '<div class="empty"><p>لا يوجد محصول مطابق.</p></div>';
+  else html += '<div class="tablewrap"><table class="tbl">'
+    + '<thead><tr><th>المحصول</th><th>موعد الزراعة</th><th>المسافات</th><th>التقاوي للدونم</th>'
+    + '<th>حتى الحصاد</th><th>الشهور</th><th>إرشادات</th></tr></thead><tbody>'
+    + list.map(function(c){
+        var on = c.m.indexOf(m) >= 0;
+        return '<tr><td><b>'+esc(c.n)+'</b>'+(on?' <span class="pill good">موسمه الآن</span>':'')+'</td>'
+          + '<td class="muted">'+esc(c.p||"—")+'</td><td>'+esc(c.s||"—")+'</td>'
+          + '<td>'+esc(c.q||"—")+'</td>'
+          + '<td class="mono">'+(c.d[0] ? c.d[0]+" - "+c.d[1]+" يوم" : "—")+'</td>'
+          + '<td class="muted">'+c.m.map(function(x){ return MONTHS_AR[x]; }).join("، ")+'</td>'
+          + '<td class="muted">'+esc(c.g||"—")+'</td></tr>'; }).join("")
+    + '</tbody></table></div>';
+  html += '</div>';
+  return html;
+}
+
+/* ============================================================
+   ٣) التقارير
+   ============================================================ */
+function filteredRows(){
+  var f = state.filters;
+  return state.records.filter(function(r){
+    if (f.kind !== "all" && r.kind !== f.kind) return false;
+    if (f.dept !== "all" && deptOf(r) !== f.dept) return false;
+    if (f.from && r.date < f.from) return false;
+    if (f.to && r.date > f.to) return false;
+    if (f.q && describe(r).indexOf(f.q) < 0 && (r.note||"").indexOf(f.q) < 0) return false;
+    return true;
+  }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+}
+function pageReports(){
+  var rows = filteredRows(), f = state.filters;
+  var rev = rows.reduce(function(s,r){ return s+revenueOf(r); },0);
+  var cost = rows.reduce(function(s,r){ return s+costOf(r); },0);
+
+  var html = sechead("السجل الكامل","التقارير",
+    "اختر القسم والفترة ونوع السجل لاستخراج تقرير مفصّل بالإيرادات والتكاليف.");
+
+  html += '<div class="filters">'
+    + '<label class="field"><span class="flabel">القسم</span><select data-filter="dept">'
+    + '<option value="all"'+(f.dept==="all"?" selected":"")+'>كل الأقسام</option>'
+    + DEPTS_ALL.map(function(d){ return '<option value="'+esc(d)+'"'+(f.dept===d?" selected":"")+'>'+d+'</option>'; }).join("")
+    + '</select></label>'
+    + '<label class="field"><span class="flabel">نوع السجل</span><select data-filter="kind">'
+    + '<option value="all"'+(f.kind==="all"?" selected":"")+'>كل الأنواع</option>'
+    + Object.keys(KINDS).map(function(k){
+        return '<option value="'+k+'"'+(f.kind===k?" selected":"")+'>'+KINDS[k].label+'</option>'; }).join("")
+    + '</select></label>'
+    + '<label class="field"><span class="flabel">من تاريخ</span><input type="date" data-filter="from" value="'+esc(f.from)+'"></label>'
+    + '<label class="field"><span class="flabel">إلى تاريخ</span><input type="date" data-filter="to" value="'+esc(f.to)+'"></label>'
+    + '<label class="field"><span class="flabel">بحث</span><input type="text" data-filter="q" placeholder="عميل، معدة، محصول…" value="'+esc(f.q)+'"></label>'
+    + '<div class="field"><span class="flabel">&nbsp;</span><button class="btn gold" data-act="csv"'+(rows.length?"":" disabled")+'>تصدير CSV</button></div>'
+    + '</div>';
+
+  html += '<div class="statstrip">'
+    + stat("عدد السجلات", NF.format(rows.length))
+    + stat("الإيرادات", money(rev), KWD, "good")
+    + stat("التكاليف", money(cost), KWD, "warn")
+    + stat("الصافي", money(rev-cost), KWD, rev-cost>=0?"good":"bad") + '</div>';
+
+  html += '<div class="panel">';
+  if (!rows.length) html += '<div class="empty"><p>لا توجد سجلات ضمن هذه الفترة. وسّع نطاق التاريخ أو غيّر القسم.</p></div>';
+  else html += '<div class="tablewrap"><table class="tbl"><thead><tr>'
+    + '<th>التاريخ</th><th>القسم</th><th>النوع</th><th>التفاصيل</th><th>الإيراد</th><th>التكلفة</th><th>ملاحظة</th><th></th>'
+    + '</tr></thead><tbody>'
+    + rows.map(function(r){
+        return '<tr><td class="mono">'+esc(r.date)+'</td>'
+          + '<td><span class="pill">'+esc(deptOf(r))+'</span></td>'
+          + '<td>'+KINDS[r.kind].icon+' '+KINDS[r.kind].label+'</td>'
+          + '<td>'+esc(describe(r))+'</td>'
+          + '<td class="mono good">'+(revenueOf(r)?money(revenueOf(r)):"—")+'</td>'
+          + '<td class="mono warn">'+(costOf(r)?money(costOf(r)):"—")+'</td>'
+          + '<td class="muted">'+(r.note?esc(r.note):"—")+'</td>'
+          + '<td><button class="linkbtn" data-act="del" data-id="'+r.id+'">حذف</button></td></tr>'; }).join("")
+    + '</tbody><tfoot><tr><td colspan="4">الإجمالي</td>'
+    + '<td class="mono good">'+money(rev)+'</td><td class="mono warn">'+money(cost)+'</td>'
+    + '<td colspan="2" class="mono">الصافي '+money(rev-cost)+' '+KWD+'</td></tr></tfoot></table></div>';
+  html += '</div>';
+  return html;
+}
+function exportCsv(){
+  var rows = filteredRows();
+  var lines = ["التاريخ,القسم,النوع,التفاصيل,الإيراد,التكلفة,ملاحظة"];
+  rows.forEach(function(r){
+    lines.push([r.date, deptOf(r), KINDS[r.kind].label, '"'+describe(r)+'"',
+      revenueOf(r).toFixed(3), costOf(r).toFixed(3), '"'+(r.note||"")+'"'].join(","));
+  });
+  var text = "﻿" + lines.join("\n");
+  download("تقرير-الاقسام.csv", text, "text/csv;charset=utf-8");
+  openModal("نسخة نصية من التقرير","إذا لم يبدأ التنزيل تلقائياً، انسخ المحتوى التالي والصقه في جدول بيانات.", text, false);
+}
+function download(name, text, mime){
+  try {
+    var blob = new Blob([text], { type:mime }), a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  } catch(e){}
+}
+
+/* ============================================================
+   ٤) التحليل
+   ============================================================ */
+function pageAnalysis(){
+  var a = analyze(state.records);
+  var html = sechead("المؤشرات","التحليل",
+    "أداء كل قسم على حدة، ومساهمته في إيراد المنشأة، محسوباً من سجلاتك مباشرة.");
+
+  if (!state.records.length)
+    return html + '<div class="panel"><div class="empty"><p>لا توجد بيانات لتحليلها بعد. أدخل بضعة سجلات وستظهر المؤشرات هنا.</p></div></div>';
+
+  html += '<div class="statstrip">'
+    + stat("الإيرادات", money(a.rev), KWD)
+    + stat("التكاليف", money(a.cost), KWD)
+    + stat("الصافي", money(a.net), KWD, a.net>=0?"good":"bad")
+    + stat("هامش الربح", fmt(a.margin), "%", a.margin>=15?"good":"warn")
+    + stat("مستحقات التحصيل", money(a.cDueVal), KWD, a.cDueVal>0?"warn":"good")
+    + stat("عقود قيد التنفيذ", NF.format(a.cOpen), "عقد") + '</div>';
+
+  html += '<div class="chartgrid">';
+  html += card("الإيرادات والتكاليف شهرياً",
+    groupedBars(a.monthly, [{key:"rev",label:"إيرادات",color:"#d9a441"},{key:"cost",label:"تكاليف",color:"#7d9a63"}]),
+    "المسار المالي للمنشأة عبر الأشهر ("+KWD+").");
+  html += card("مساهمة الأقسام في الإيراد",
+    donut(a.revByDept, a.revByDept.map(function(x){ return DEPT_COLORS[x.name] || "#5c5548"; })),
+    "أي قسم يصنع الإيراد فعلياً.");
+  html += card("صافي الربح لكل قسم", hBars(a.netByDept, "#7d9a63", KWD, true),
+    "الأعمدة الحمراء تعني قسماً تكاليفه أعلى من إيراده.");
+  html += card("أعلى العملاء بالإيراد", hBars(a.byCustomer, "#d9a441", KWD),
+    "مجموع ما دفعه كل عميل عبر كل الأقسام.");
+  html += card("أيام تأجير كل معدة", hBars(a.equipDays, "#6f8fa6", "يوم"),
+    "المعدات الغائبة عن القائمة لم تُؤجَّر في أي سجل.");
+  html += card("منتجات ورشة الحديد", hBars(a.workQty, "#8a8f98", "قطعة"),
+    "عدد القطع المنفّذة من كل منتج.");
+  html += card("أكثر المحاصيل زراعة", hBars(a.byCrop, "#7d9a63", "شتلة"),
+    "من سجلات الزراعة في قسم المشتل.");
+
+  var ops = '<table class="minitable"><tbody>'
+    + row2("إيراد التأجير", money(a.rentRev)+" "+KWD)
+    + row2("إيراد بيع المعدات", money(a.sellRev)+" "+KWD)
+    + row2("تكلفة صيانة المعدات", money(a.maintCost)+" "+KWD)
+    + row2("متوسط الأجرة اليومية", (a.rentDays ? money(a.rentRev/a.rentDays) : "—")+" "+KWD)
+    + row2("قطع الحديد المنفّذة", fmt(a.wPieces)+" قطعة")
+    + row2("حديد مستهلك", fmt(a.wKg)+" كجم")
+    + row2("عائد الكيلو من الحديد", (a.wKg ? money(a.wRev/a.wKg) : "—")+" "+KWD)
+    + row2("هامش الورشة", (a.wRev ? fmt((a.wRev-a.wCost)/a.wRev*100) : "—")+"%")
+    + row2("مساحة المقاولات المنفّذة", fmt(a.cArea)+" م²")
+    + row2("عقود مكتملة ومحصّلة", fmt(a.cDone)+" عقد")
+    + row2("شتلات مزروعة", fmt(a.planted)+" شتلة")
+    + row2("مساحة مزروعة", fmt(a.areaPlanted)+" دونم")
+    + row2("مياه ريّ المشتل", fmt(a.water)+" م³")
+    + '</tbody></table>';
+  html += card("مؤشرات تشغيلية", ops, "أرقام الأقسام التي لا تظهر في الرسوم المالية.");
+  html += '</div>';
+  return html;
+}
+
+/* ============================================================
+   ٥) الاقتراحات
+   ============================================================ */
+function suggest(recs, a){
+  var out = [];
+  function add(t,area,title,body,ev){ out.push({type:t, area:area, title:title, body:body, evidence:ev}); }
+
+  if (a.net < 0){
+    var worst = a.netByDept[a.netByDept.length-1];
+    add("alert","الإدارة","المنشأة تعمل بخسارة إجمالية",
+      "راجع الأقسام ذات الصافي السالب أولاً؛ قسم واحد خاسر قد يبتلع أرباح البقية.",
+      "الصافي "+money(a.net)+" "+KWD+(worst?" · أضعف قسم: "+worst.name:""));
+  } else if (a.rev > 0 && a.margin < 15){
+    add("opp","الإدارة","هامش الربح منخفض",
+      "الهامش أقل من 15% يعني أن أي ارتفاع في الحديد أو الوقود سيمحو الربح. راجع تسعير الورشة والمقاولات.",
+      "الهامش "+fmt(a.margin)+"% من إيراد "+money(a.rev)+" "+KWD);
+  } else if (a.rev > 0){
+    add("ok","الإدارة","الأداء العام سليم",
+      "الهامش الحالي يسمح بالتوسع. وجّه الفائض إلى القسم صاحب أعلى عائد على التكلفة.",
+      "الهامش "+fmt(a.margin)+"% · الصافي "+money(a.net)+" "+KWD);
+  }
+
+  a.byDept.forEach(function(d){
+    if (d.name === "مشترك") return;
+    if (d.net < 0 && (d.rev > 0 || d.cost > 0))
+      add("alert", d.name, "قسم «"+d.name+"» يعمل بخسارة",
+        "إما أن التسعير أقل من التكلفة الحقيقية، أو أن مصروفات القسم تُحمَّل عليه دون إيراد مقابل. راجع آخر عشرة سجلات فيه.",
+        "إيراد "+money(d.rev)+" مقابل تكلفة "+money(d.cost)+" "+KWD);
+    else if (d.margin !== null && d.margin > 45)
+      add("ok", d.name, "قسم «"+d.name+"» هو الأعلى ربحية",
+        "هامش بهذا المستوى يستحق زيادة الطاقة: عمالة أو معدات إضافية تُسدَّد من ربح القسم نفسه.",
+        "هامش "+fmt(d.margin)+"%");
+  });
+
+  var totalRev = a.revByDept.reduce(function(s,x){ return s+x.value; },0);
+  if (a.revByDept.length && totalRev && a.revByDept[0].value/totalRev > 0.6)
+    add("opp","الإدارة","الإيراد معتمد على قسم واحد",
+      "خمسة أقسام والإيراد من واحد فقط يعني أن أي ركود في هذا النشاط يوقف المنشأة. فعّل الأقسام الأخرى بعرض مشترك للعملاء الحاليين.",
+      a.revByDept[0].name+" يشكّل "+fmt(a.revByDept[0].value/totalRev*100)+"% من الإيراد");
+
+  var totalCust = a.byCustomer.reduce(function(s,c){ return s+c.value; },0);
+  if (a.byCustomer.length && totalCust && a.byCustomer[0].value/totalCust > 0.5)
+    add("opp","التسويق","عميل واحد يمثّل نصف الإيراد",
+      "الاعتماد على عميل واحد خطر تحصيل وخطر توقف معاً. استهدف عملاء من نفس القطاع بعرض مشابه.",
+      a.byCustomer[0].name+" — "+money(a.byCustomer[0].value)+" "+KWD);
+
+  /* المعدات */
+  a.equipList.forEach(function(e){
+    if (e.days > 0 && e.last && daysSince(e.last) > 45)
+      add("opp","المعدات","«"+e.name+"» متوقفة عن التأجير",
+        "معدة سبق تأجيرها ولم تتحرك منذ فترة طويلة رأس مال معطّل. اعرضها بسعر موسمي أو استخدمها داخلياً في المقاولات.",
+        "آخر تأجير قبل "+fmt(daysSince(e.last))+" يوماً");
+    if (e.rev > 0 && e.cost > e.rev)
+      add("alert","المعدات","صيانة «"+e.name+"» تتجاوز إيرادها",
+        "التكلفة التراكمية أعلى من العائد. قرّر بين إصلاح جذري أو استبدالها قبل موسم الطلب القادم.",
+        "تكلفة "+money(e.cost)+" مقابل إيراد "+money(e.rev)+" "+KWD);
+  });
+  if (a.rentDays > 0 && a.maintCost > a.rentRev*0.3)
+    add("opp","المعدات","الصيانة تلتهم ثلث إيراد التأجير",
+      "ارفع الأجرة اليومية أو أدخل صيانة وقائية مجدولة بدل الإصلاح بعد العطل.",
+      "صيانة "+money(a.maintCost)+" مقابل تأجير "+money(a.rentRev)+" "+KWD);
+
+  /* الورشة — مقارنة بأسعار القائمة */
+  a.workProducts.forEach(function(p){
+    var list = workPrice(p.name);
+    if (!list || !p.qty) return;
+    var avg = p.rev / p.qty;
+    if (avg < list * 0.9)
+      add("opp","ورشة الحديد","«"+p.name+"» يُباع تحت سعر القائمة",
+        "متوسط البيع الفعلي أقل من السعر المعتمد في جدول الأسعار. راجع الخصومات الممنوحة أو حدّث السعر إن تغيّرت التكلفة.",
+        "متوسط "+money(avg)+" مقابل قائمة "+money(list)+" "+KWD);
+    if (p.rev > 0 && p.cost/p.rev > 0.8)
+      add("alert","ورشة الحديد","«"+p.name+"» تكلفته قريبة من سعره",
+        "الخامات والعمالة تلتهم معظم قيمة البيع. أعد حساب سعر القطعة على أساس وزن الحديد الحالي.",
+        "التكلفة "+fmt(p.cost/p.rev*100)+"% من الإيراد");
+  });
+  if (a.wRev > 0){
+    var wm = (a.wRev-a.wCost)/a.wRev*100;
+    if (wm < 20)
+      add("alert","ورشة الحديد","هامش الورشة منخفض",
+        "سعر القطعة لا يغطي الخامات والعمالة بفارق كافٍ. احسب ساعات العمل ضمن التكلفة لا خارجها.",
+        "الهامش "+fmt(wm)+"% · عائد الكيلو "+(a.wKg?money(a.wRev/a.wKg):"—")+" "+KWD);
+    else
+      add("ok","ورشة الحديد","تسعير الورشة سليم",
+        "استمر في تسجيل وزن الحديد في كل أمر شغل — هو أدق مؤشر لمراجعة السعر عند تغيّر سعر الخامة.",
+        "الهامش "+fmt(wm)+"%");
+  }
+  if (recs.some(function(r){ return r.kind === "workshop"; }) && a.wKg === 0)
+    add("opp","ورشة الحديد","وزن الحديد غير مسجَّل",
+      "بدون الوزن لا يمكن معرفة تكلفة القطعة الحقيقية عند تغيّر سعر الحديد. سجّله في كل أمر شغل.", null);
+
+  /* المقاولات */
+  if (a.cDueVal > 0)
+    add("alert","مقاولات زراعية","مستحقات لم تُحصَّل",
+      "عقود مكتملة وقيمتها ما زالت عند العملاء. رتّب متابعة تحصيل أسبوعية قبل أن تتقادم المطالبة.",
+      a.cDue+" عقد بقيمة "+money(a.cDueVal)+" "+KWD);
+  if (a.oldestOpen && daysSince(a.oldestOpen) > 60)
+    add("opp","مقاولات زراعية","عقد قيد التنفيذ منذ فترة طويلة",
+      "طول مدة التنفيذ يرفع التكلفة ويؤخر الدفعة. راجع سبب التأخير: عمالة، معدات، أم انتظار العميل؟",
+      "أقدم عقد مفتوح بدأ قبل "+fmt(daysSince(a.oldestOpen))+" يوماً");
+
+  /* المواشي */
+  var health = recs.filter(function(r){ return r.kind === "livestock" && r.category === "صحة"; })
+    .map(function(r){ return daysSince(r.date); }).sort(function(x,y){ return x-y; })[0];
+  var hasLive = recs.some(function(r){ return r.kind === "livestock"; });
+  if (hasLive && health === undefined)
+    add("alert","المواشي","لا توجد سجلات صحة أو تطعيم",
+      "الفحوصات والتطعيمات أرخص وقاية للقطيع. حدّد موعداً بيطرياً وسجّله ليبدأ التتبع.", null);
+  else if (health !== undefined && health > 90)
+    add("alert","المواشي","مضى وقت طويل على آخر فحص بيطري",
+      "الفجوة الطويلة بين الفحوصات ترفع خطر انتشار المرض داخل الحظائر. رتّب زيارة بيطرية قريبة.",
+      "آخر سجل صحة قبل "+fmt(health)+" يوماً");
+  else if (health !== undefined)
+    add("ok","المواشي","المتابعة البيطرية منتظمة",
+      "استمر على هذا الإيقاع واربط كل فحص بعدد الرؤوس المعالجة لرصد أي تكرار غير طبيعي.",
+      "آخر سجل صحة قبل "+fmt(health)+" يوماً");
+
+  var feed = recs.filter(function(r){ return r.kind === "livestock" && r.category === "تغذية"; });
+  var heads = feed.length ? num(feed[0].head) : 0;
+  if (feed.length >= 4 && heads > 0){
+    var perHead = feed.reduce(function(s,r){ return s+num(r.qty); },0)/feed.length/heads;
+    if (perHead > 3.5)
+      add("opp","المواشي","استهلاك العلف لكل رأس مرتفع",
+        "راجع خلطة العلف وأوقات التقديم؛ الفاقد حول المعالف يرفع الاستهلاك دون فائدة للقطيع.",
+        fmt(perHead)+" كجم لكل رأس في السجل الواحد");
+  }
+
+  /* المشتل والتقويم الزراعي */
+  var m = new Date().getMonth()+1;
+  var seasonal = cropsForMonth(m);
+  var plantedThisMonth = {};
+  recs.filter(function(r){ return r.kind === "planting" && parseInt(r.date.slice(5,7),10) === m; })
+      .forEach(function(r){ plantedThisMonth[r.crop] = true; });
+  var missed = seasonal.filter(function(c){ return !plantedThisMonth[c.n]; });
+  if (missed.length)
+    add("opp","المشتل","محاصيل موسمها الآن ولم تُزرع",
+      "شهر "+MONTHS_AR[m]+" هو الموعد المناسب لهذه المحاصيل حسب التقويم الزراعي. تأخير الزراعة يقصّر الموسم ويقلّل الإنتاج.",
+      missed.slice(0,8).map(function(c){ return c.n; }).join("، ")
+        + (missed.length > 8 ? " و"+(missed.length-8)+" غيرها" : ""));
+
+  if (a.upcoming.length)
+    add("opp","المشتل","حصاد مستحق خلال شهر",
+      "جهّز العمالة وقنوات البيع قبل موعد الحصاد؛ التأخير في التصريف يخفض السعر والجودة معاً.",
+      a.upcoming.slice(0,4).map(function(x){ return x.crop+" بعد "+x.left+" يوم"; }).join("، "));
+  if (a.late.length)
+    add("alert","المشتل","زراعات تجاوزت موعد حصادها",
+      "المحصول المتروك بعد نضجه يفقد جودته ويشغل المساحة عن الدورة التالية. احصده أو سجّل الحصاد إن تم فعلاً.",
+      a.late.slice(0,4).map(function(x){ return x.crop+" ("+x.zone+")"; }).join("، "));
+  if (a.offSeason.length)
+    add("opp","المشتل","زراعات خارج موسمها",
+      "زراعة خارج الشهور المناسبة تحتاج حماية إضافية وتعطي إنتاجاً أقل. راجع التقويم قبل الدورة القادمة.",
+      a.offSeason.slice(0,4).map(function(r){ return r.crop+" ("+r.date+")"; }).join("، "));
+
+  var lastIrrig = {};
+  recs.filter(function(r){ return r.kind === "nurseryOps" && r.opType === "ريّ"; }).forEach(function(r){
+    var d = daysSince(r.date);
+    if (lastIrrig[r.zone] === undefined || lastIrrig[r.zone] > d) lastIrrig[r.zone] = d;
+  });
+  var active = {};
+  recs.filter(function(r){ return r.kind === "planting" && daysSince(r.date) < 120; })
+      .forEach(function(r){ active[r.zone] = true; });
+  var dry = Object.keys(active).filter(function(z){ return lastIrrig[z] === undefined || lastIrrig[z] > 10; });
+  if (dry.length)
+    add("alert","المشتل","مواقع مزروعة بلا سجل ريّ حديث",
+      "إما أن الريّ يحدث دون تسجيل، أو أن هذه المواقع فعلاً متأخرة. راجعها اليوم وسجّل كل دورة ريّ.",
+      dry.join("، "));
+
+  if (a.planted > 0 && a.soldNursery/a.planted < 0.5)
+    add("opp","المشتل","الإنتاج يفوق المبيعات",
+      "الشتلات الجاهزة تتراكم وتستهلك مياهاً وعمالة. اعرضها على عملاء المقاولات ضمن مشاريع التشجير بدل انتظار مشترٍ خارجي.",
+      "بيع "+fmt(a.soldNursery)+" من أصل "+fmt(a.planted)+" شتلة");
+
+  /* تكامل الأقسام */
+  if (recs.some(function(r){ return r.kind === "contract"; })
+      && recs.some(function(r){ return r.kind === "planting"; }) && a.soldNursery === 0)
+    add("opp","الإدارة","الأقسام لا تغذّي بعضها",
+      "مشاريع التشجير عندك والمشتل عندك؛ توريد شتلات المشتل لعقود المقاولات يحوّل تكلفة داخلية إلى إيراد مسجَّل.", null);
+  if (recs.some(function(r){ return r.kind === "workshop"; })
+      && recs.some(function(r){ return r.kind === "livestock"; }))
+    add("ok","الإدارة","الورشة تخدم حظائرك",
+      "المعالف والمكابس التي تصنعها الورشة تُستخدم في قسم المواشي — سجّل ما يُستهلك داخلياً كتكلفة على المواشي لتبقى ربحية كل قسم دقيقة.", null);
+
+  /* المصروفات */
+  var expBy = {}, expTotal = 0;
+  recs.filter(function(r){ return r.kind === "expense"; }).forEach(function(r){
+    expBy[r.category] = (expBy[r.category]||0) + num(r.cost); expTotal += num(r.cost);
+  });
+  var topExp = Object.keys(expBy).map(function(k){ return [k, expBy[k]]; })
+    .sort(function(x,y){ return y[1]-x[1]; })[0];
+  if (topExp && expTotal && topExp[1]/expTotal > 0.4)
+    add("opp","الإدارة","بند «"+topExp[0]+"» يستحوذ على معظم المصروفات",
+      "بند بهذا الحجم يعني أن أي تحسين فيه ينعكس مباشرة على الربح. اطلب عروض أسعار بديلة أو وزّعه على الأقسام المستفيدة بدقة.",
+      money(topExp[1])+" من أصل "+money(expTotal)+" "+KWD+" ("+fmt(topExp[1]/expTotal*100)+"%)");
+  var shared = recs.filter(function(r){ return r.kind === "expense" && r.dept === "مشترك"; })
+    .reduce(function(s,r){ return s+num(r.cost); },0);
+  if (expTotal > 0 && shared/expTotal > 0.35)
+    add("opp","الإدارة","مصروفات مشتركة كثيرة",
+      "كلما زادت المصروفات غير المنسوبة لقسم، قلّت دقة ربحية كل قسم. وزّعها حسب الاستخدام الفعلي.",
+      "المشترك "+fmt(shared/expTotal*100)+"% من المصروفات");
+
+  if (recs.length < 20)
+    add("opp","الإدارة","السجلات ما زالت قليلة",
+      "دقة التحليل ترتفع مع انتظام الإدخال. سجّل حركات الأقسام يومياً لأسبوعين وستصبح التوصيات أدق بكثير.",
+      recs.length+" سجل حتى الآن");
+  return out;
+}
+
+function pageAdvice(){
+  var a = analyze(state.records), items = suggest(state.records, a);
+  var html = sechead("قراءة البيانات","الاقتراحات",
+    "قواعد تقرأ سجلات الأقسام الخمسة والتقويم الزراعي وتقترح الخطوة التالية.");
+  if (!state.records.length)
+    return html + '<div class="panel"><div class="empty"><p>الاقتراحات تُبنى على سجلاتك. أدخل حركات الأقسام أولاً وستظهر التوصيات هنا.</p></div></div>';
+
+  [{k:"alert",l:"يحتاج انتباهاً",t:"bad"},{k:"opp",l:"فرص للتحسين",t:"warn"},{k:"ok",l:"مؤشرات سليمة",t:"good"}]
+  .forEach(function(g){
+    var list = items.filter(function(i){ return i.type === g.k; });
+    if (!list.length) return;
+    html += '<div class="advgroup"><h3 class="advhead '+g.t+'">'+g.l+' <span>'+list.length+'</span></h3><div class="advlist">'
+      + list.map(function(i){
+          return '<article class="advcard '+g.t+'"><header><h4>'+esc(i.title)+'</h4>'
+            + '<span class="advtag">'+esc(i.area)+'</span></header><p>'+esc(i.body)+'</p>'
+            + (i.evidence ? '<p class="evidence">'+esc(i.evidence)+'</p>' : '') + '</article>'; }).join("")
+      + '</div></div>';
+  });
+  return html;
+}
+
+/* ============================================================
+   بيانات تجريبية بالدينار الكويتي
+   ============================================================ */
+function demoRecords(){
+  var out = [], w;
+  function d(b){ return new Date(Date.now()-b*86400000).toISOString().slice(0,10); }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function rnd(n){ return Math.round(Math.random()*n); }
+  var CUST = ["مزارع الوفرة","شركة الخليج للمقاولات","مشتل الربيع","عبدالله المطيري","بلدية الجهراء","استراحة العبدلي"];
+  var SEASON = cropsForMonth(new Date().getMonth()+1).map(function(c){ return c.n; });
+  if (!SEASON.length) SEASON = CROPS.slice(0,10).map(function(c){ return c.n; });
+  var IRON = WORK_PRODUCTS.filter(function(p){ return p.p > 0; });
+
+  for (w=0; w<13; w++){
+    var b = w*7;
+    out.push({id:uid(), kind:"livestock", date:d(b+1), category:"تغذية", head:220, qty:620+rnd(140), cost:390+rnd(90), note:""});
+    if (w%4===0) out.push({id:uid(), kind:"livestock", date:d(b+3), category:"تكاثر", head:220, qty:7+rnd(6), cost:35, note:""});
+    if (w%6===0) out.push({id:uid(), kind:"livestock", date:d(b+4), category:"صحة", head:220, qty:220, cost:180+rnd(60), note:"تطعيم دوري"});
+    out.push({id:uid(), kind:"sales", date:d(b+5), dept:"المواشي", product:pick(["أغنام حية","لحوم","ألبان"]),
+      channel:pick(["السوق المحلي","أفراد من المزرعة"]), customer:pick(CUST), qty:8+rnd(14), price:35+rnd(30), note:""});
+
+    out.push({id:uid(), kind:"planting", date:d(b+2), crop:pick(SEASON), zone:pick(ZONES),
+      area:1+rnd(4), qty:250+rnd(350), cost:60+rnd(70), note:""});
+    out.push({id:uid(), kind:"nurseryOps", date:d(b+2), opType:"ريّ", zone:pick(ZONES), qty:45+rnd(25)+w, cost:8+rnd(6), note:""});
+    out.push({id:uid(), kind:"nurseryOps", date:d(b+4), opType:pick(["تجهيز","صيانة","حصاد"]), zone:pick(ZONES), qty:40+rnd(110), cost:15+rnd(25), note:""});
+    out.push({id:uid(), kind:"sales", date:d(b+6), dept:"المشتل", product:pick(NURS_PRODUCTS),
+      channel:pick(["مشاتل التجزئة","أفراد من المزرعة","جهة حكومية"]), customer:pick(CUST), qty:90+rnd(160), price:0.75+rnd(3), note:""});
+
+    out.push({id:uid(), kind:"equipment", date:d(b+1), opType:"تأجير", equipment:pick(EQUIPMENT.slice(0,6)),
+      customer:pick(CUST), qty:3+rnd(9), price:18+rnd(28), cost:9+rnd(18), note:""});
+    if (w%3===0) out.push({id:uid(), kind:"equipment", date:d(b+5), opType:"صيانة", equipment:pick(EQUIPMENT.slice(0,6)),
+      customer:"", qty:3+rnd(6), price:0, cost:45+rnd(80), note:"صيانة دورية"});
+    if (w%7===0) out.push({id:uid(), kind:"equipment", date:d(b+3), opType:"بيع", equipment:"مضخة ريّ",
+      customer:pick(CUST), qty:1+rnd(2), price:220+rnd(180), cost:150+rnd(90), note:""});
+
+    var ip = pick(IRON);
+    out.push({id:uid(), kind:"workshop", date:d(b+3), product:ip.n, customer:pick(CUST),
+      qty:1+rnd(5), weight:25+rnd(60), price:ip.p, cost:(ip.p*0.55+rnd(8))*(1), note:""});
+    if (w%2===0){
+      var ip2 = pick(IRON);
+      out.push({id:uid(), kind:"workshop", date:d(b+6), product:ip2.n, customer:pick(CUST),
+        qty:2+rnd(6), weight:30+rnd(80), price:ip2.p, cost:ip2.p*0.6+rnd(10), note:""});
+    }
+
+    if (w%3===0) out.push({id:uid(), kind:"contract", date:d(b+2), project:pick(PROJECTS), customer:pick(CUST),
+      area:600+rnd(4000), value:900+rnd(4500), cost:620+rnd(2600), status:pick(PROJECT_STATUS), note:""});
+
+    out.push({id:uid(), kind:"expense", date:d(b+1), category:pick(EXP_CATS), dept:pick(DEPTS_ALL), cost:35+rnd(220), note:""});
+    out.push({id:uid(), kind:"expense", date:d(b+4), category:pick(["وقود","عمالة","كهرباء ومياه"]), dept:pick(DEPTS_ALL), cost:60+rnd(180), note:""});
+  }
+  return out.sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+}
+
+/* ============================================================
+   النافذة والتفاعل
+   ============================================================ */
+function openModal(title, note, text, importMode){
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalNote").textContent = note;
+  var ta = document.getElementById("modalText");
+  ta.value = text; ta.readOnly = !importMode;
+  document.getElementById("importBtn").hidden = !importMode;
+  document.getElementById("modal").hidden = false;
+  if (!importMode) ta.select();
+}
+function closeModal(){ document.getElementById("modal").hidden = true; }
+
+function render(){
+  var p = document.getElementById("page");
+  if (state.tab === "entry") p.innerHTML = pageEntry();
+  else if (state.tab === "calendar") p.innerHTML = pageCalendar();
+  else if (state.tab === "reports") p.innerHTML = pageReports();
+  else if (state.tab === "analysis") p.innerHTML = pageAnalysis();
+  else p.innerHTML = pageAdvice();
+
+  var tabs = document.querySelectorAll(".tab"), i;
+  for (i=0;i<tabs.length;i++) tabs[i].classList.toggle("on", tabs[i].getAttribute("data-tab") === state.tab);
+  if (state.tab === "entry") refreshDynamic();
+  window.scrollTo({ top:0, behavior:"auto" });
+}
+
+document.getElementById("tabs").addEventListener("click", function(e){
+  var b = e.target.closest("[data-tab]"); if (!b) return;
+  state.tab = b.getAttribute("data-tab"); render();
+});
+
+document.addEventListener("click", function(e){
+  var b = e.target.closest("[data-act]"); if (!b) return;
+  var act = b.getAttribute("data-act");
+  if (act === "kind"){ state.kind = b.getAttribute("data-kind"); render(); }
+  else if (act === "save") submitForm();
+  else if (act === "clear") render();
+  else if (act === "del") delRecord(b.getAttribute("data-id"));
+  else if (act === "demo"){ state.records = demoRecords(); save(); render(); toast("تمت تعبئة بيانات تجريبية لثلاثة أشهر"); }
+  else if (act === "csv") exportCsv();
+  else if (act === "export-json"){
+    var json = JSON.stringify(state.records, null, 2);
+    download("نسخة-البيانات.json", json, "application/json");
+    openModal("نسخة احتياطية","احفظ هذا النص في ملف، أو انسخه إلى جهاز آخر واستورده هناك.", json, false);
+  }
+  else if (act === "import-json") openModal("استيراد نسخة","الصق محتوى ملف النسخة الاحتياطية هنا ثم اضغط استيراد. سيحل محل البيانات الحالية.", "", true);
+  else if (act === "modal-import"){
+    try {
+      var data = JSON.parse(document.getElementById("modalText").value);
+      if (!Array.isArray(data)) throw new Error("bad");
+      state.records = data; save(); closeModal(); render(); toast("تم استيراد "+data.length+" سجل");
+    } catch(err){ toast("الملف غير صالح — تأكد من نسخ المحتوى كاملاً"); }
+  }
+  else if (act === "modal-close") closeModal();
+  else if (act === "wipe"){
+    if (confirm("سيتم حذف جميع السجلات نهائياً. هل أنت متأكد؟")){
+      state.records = []; save(); render(); toast("تم حذف كل البيانات");
+    }
+  }
+});
+
+document.addEventListener("input", function(e){
+  var t = e.target;
+  if (t.closest("#form")){
+    if (t.getAttribute("data-name") === "price") t.removeAttribute("data-auto");
+    refreshDynamic();
+  }
+  var fk = t.getAttribute && t.getAttribute("data-filter");
+  if (fk){ state.filters[fk] = t.value; rerenderKeepFocus('[data-filter="'+fk+'"]'); }
+  if (t.getAttribute && t.getAttribute("data-cq")){ state.cq = t.value; rerenderKeepFocus('[data-cq="1"]'); }
+});
+document.addEventListener("change", function(e){ if (e.target.closest("#form")) refreshDynamic(); });
+
+var rtimer = null;
+function rerenderKeepFocus(sel){
+  clearTimeout(rtimer);
+  rtimer = setTimeout(function(){
+    var pos = null, el = document.querySelector(sel);
+    if (el && el.type === "text") pos = el.selectionStart;
+    render();
+    var el2 = document.querySelector(sel);
+    if (el2){ el2.focus(); if (pos !== null && el2.setSelectionRange) el2.setSelectionRange(pos,pos); }
+  }, 180);
+}
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeModal(); });
+
+load(function(){ render(); });
+</script>
+</body>
+</html>
