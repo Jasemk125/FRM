@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>مزرعتي — إدارة الأقسام الخمسة v3</title>
+<title>مزرعتي — إدارة الأقسام الخمسة</title>
 <style>
 :root{
   --ink:#1f1c19; --ink2:#26231f; --panel:#2a2622; --line:#3b362f;
@@ -96,6 +96,62 @@ input[type=date]{color-scheme:dark}
 .tbl th{text-align:start; font-weight:600; color:var(--muted); font-size:12.5px; padding:0 10px 10px; border-bottom:1px solid var(--line)}
 .tbl td{padding:11px 10px; border-bottom:1px dashed var(--line); vertical-align:top}
 .tbl tfoot td{border-bottom:none; border-top:1px solid var(--gold); color:var(--gold); font-weight:700}
+.tbl th.sortable{cursor:pointer; user-select:none; white-space:nowrap}
+.tbl th.sortable:hover{color:var(--cream)}
+.tbl th .arrow{color:var(--gold)}
+.tbl tr.picked td{background:#d9a4410f}
+.tbl td.selcol,.tbl th.selcol{width:34px; padding-inline:6px}
+.tbl input[type=checkbox]{width:16px; height:16px; accent-color:var(--gold); cursor:pointer}
+.rowbtns{display:flex; gap:10px; white-space:nowrap}
+
+.pager{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;
+  padding-top:14px; border-top:1px solid var(--line)}
+.pager .pinfo{font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums}
+.pager .pbtns{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+.pbtn{background:var(--field); border:1px solid var(--line); color:var(--cream); border-radius:8px;
+  padding:6px 13px; cursor:pointer; font-variant-numeric:tabular-nums}
+.pbtn:hover:not(:disabled){border-color:var(--gold)}
+.pbtn:disabled{opacity:.35; cursor:not-allowed}
+.pbtn.on{background:var(--gold); border-color:var(--gold); color:#231f1a; font-weight:700}
+
+.bulkbar{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;
+  background:#d9a4411a; border:1px solid var(--gold); border-radius:10px; padding:10px 16px}
+.bulkbar[hidden]{display:none}
+.bulkbar b{color:var(--gold)}
+.chiprow{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px}
+.qchip{background:var(--panel); border:1px solid var(--line); color:var(--muted); border-radius:999px;
+  padding:5px 13px; cursor:pointer; font-size:13px}
+.qchip:hover{border-color:#5c5548; color:var(--cream)}
+.qchip.on{border-color:var(--gold); color:var(--gold); background:#d9a4411a}
+
+.modalbox.wide{max-width:860px}
+.modalbox .formgrid{margin-top:4px}
+.editmeta{font-size:12.5px; color:var(--muted); margin:0 0 14px}
+
+/* ---------- الصفحة الفنية ---------- */
+.group{margin-bottom:18px}
+.group > h4{font-size:16px; color:var(--gold); margin-bottom:12px; display:flex; align-items:center; gap:9px}
+.group > h4::after{content:""; flex:1; height:1px; background:var(--line)}
+.sgrid{display:grid; grid-template-columns:1.15fr .85fr; gap:18px; align-items:start}
+@media (max-width:900px){ .sgrid{grid-template-columns:1fr} }
+.resultcard{position:sticky; top:84px}
+.bigresult{text-align:center; padding:18px 10px 22px; border-bottom:1px dashed var(--line); margin-bottom:16px}
+.bigresult .lbl{display:block; font-size:13px; color:var(--muted)}
+.bigresult .val{font-family:Amiri,Georgia,serif; font-size:40px; line-height:1.2; display:block}
+.bigresult .val.good{color:var(--green)} .bigresult .val.bad{color:var(--clay)}
+.bigresult .sub{font-size:12.5px; color:var(--muted)}
+.costbar{display:flex; height:13px; border-radius:7px; overflow:hidden; margin:4px 0 12px; background:var(--field)}
+.costbar span{display:block; height:100%}
+.costkey{display:flex; flex-wrap:wrap; gap:4px 16px; font-size:12.5px; color:var(--muted); margin-bottom:16px}
+.costkey i{width:9px; height:9px; border-radius:2px; display:inline-block; margin-inline-end:6px}
+.gauge{margin:14px 0 4px}
+.gauge .track{height:9px; border-radius:5px; background:var(--field); overflow:hidden}
+.gauge .fill{height:100%; background:var(--gold)}
+.gauge .cap{display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:6px}
+.studytag{display:inline-block; font-size:11.5px; border-radius:999px; padding:2px 10px; margin-inline-start:6px}
+.studytag.good{background:#7d9a6326; color:var(--green)}
+.studytag.bad{background:#b9663f26; color:var(--clay)}
+.studytag.warn{background:#d9a44126; color:var(--gold)}
 .mono{font-variant-numeric:tabular-nums; white-space:nowrap}
 .good{color:var(--green)} .warn{color:var(--gold)} .muted{color:var(--muted)}
 .pill{background:#ffffff0d; border-radius:999px; padding:3px 10px; font-size:12.5px; white-space:nowrap}
@@ -153,6 +209,7 @@ svg.chart{width:100%; height:auto; display:block}
   </div>
   <nav class="tabs" id="tabs">
     <button class="tab on" data-tab="entry">إدخال البيانات</button>
+    <button class="tab" data-tab="study">الصفحة الفنية</button>
     <button class="tab" data-tab="calendar">التقويم الزراعي</button>
     <button class="tab" data-tab="reports">التقارير</button>
     <button class="tab" data-tab="analysis">التحليل</button>
@@ -161,6 +218,22 @@ svg.chart{width:100%; height:auto; display:block}
 </header>
 
 <main class="page" id="page"></main>
+
+<div class="modal" id="editModal" hidden>
+  <div class="modalbox wide">
+    <h3 id="editTitle">تعديل السجل</h3>
+    <p class="editmeta" id="editMeta"></p>
+    <div class="formgrid" id="editForm"></div>
+    <div class="cropinfo" id="editCropInfo" hidden></div>
+    <p class="hint" id="editHint"></p>
+    <p class="err" id="editErr" hidden></p>
+    <div class="actions">
+      <button class="btn gold" data-act="save">حفظ التعديل</button>
+      <button class="btn ghost" data-act="edit-cancel">إلغاء</button>
+      <button class="btn ghost" data-act="edit-delete">حذف هذا السجل</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="modal" hidden>
   <div class="modalbox">
@@ -418,8 +491,17 @@ function costOf(r){ return num(r.cost); }
 function unitOf(rec, f){ return f.dyn ? f.dyn(rec) : (f.u || ""); }
 
 /* ---------- الحالة والتخزين ---------- */
-var state = { tab:"entry", records:[], kind:"livestock",
-  filters:{ kind:"all", dept:"all", from:"", to:"", q:"" }, cq:"" };
+var state = {
+  tab:"entry", records:[], kind:"livestock", formKind:"livestock",
+  filters:{ kind:"all", dept:"all", from:"", to:"", q:"" },
+  cq:"", quick:"",
+  sortKey:"date", sortDir:"desc",
+  page:1, per:25,
+  sel:{}, editId:null,
+  studies:[], study:null, studyId:null
+};
+function selCount(){ return Object.keys(state.sel).length; }
+function clearSel(){ state.sel = {}; }
 
 function save(){
   try { if (window.storage) window.storage.set(STORE_KEY, JSON.stringify(state.records));
@@ -440,9 +522,28 @@ function load(cb){
   cb();
 }
 function addRecord(r){ state.records.unshift(r); save(); }
+function recById(id){
+  for (var i=0;i<state.records.length;i++) if (state.records[i].id === id) return state.records[i];
+  return null;
+}
+function updateRecord(id, data){
+  for (var i=0;i<state.records.length;i++){
+    if (state.records[i].id === id){ data.id = id; state.records[i] = data; break; }
+  }
+  save();
+}
 function delRecord(id){
-  state.records = state.records.filter(function(r){ return r.id !== id; });
+  var r = recById(id); if (!r) return;
+  if (!confirm("حذف هذا السجل نهائياً؟\n\n" + r.date + " — " + describe(r))) return;
+  state.records = state.records.filter(function(x){ return x.id !== id; });
+  delete state.sel[id];
   save(); render(); toast("تم حذف السجل");
+}
+function delSelected(){
+  var ids = Object.keys(state.sel); if (!ids.length) return;
+  if (!confirm("حذف " + ids.length + " سجلاً نهائياً؟ لا يمكن التراجع.")) return;
+  state.records = state.records.filter(function(r){ return !state.sel[r.id]; });
+  clearSel(); save(); render(); toast("تم حذف " + ids.length + " سجلاً");
 }
 var toastTimer = null;
 function toast(msg){
@@ -694,25 +795,9 @@ function pageEntry(){
          + KINDS[key].icon+' '+KINDS[key].label+'</button>'; }).join("") + '</div>';
 
   html += '<div class="panel"><div class="panel-head"><h3>'+k.icon+' '+k.label+'</h3>'
-        + '<span class="panel-tag">'+(k.dept || "متعدد الأقسام")+'</span></div><div class="formgrid" id="form">';
-
-  var seed = {}; k.fields.forEach(function(x){ if (x.t==="select") seed[x.n] = x.o[0]; });
-  k.fields.forEach(function(f){
-    var unit = unitOf(seed, f);
-    html += '<label class="field'+(f.wide?" wide":"")+'"><span class="flabel">'+f.l
-          + (unit ? '<em class="unit" data-unit="'+f.n+'">'+unit+'</em>' : '') + '</span>';
-    if (f.t === "select"){
-      html += '<select data-name="'+f.n+'">' + f.o.map(function(o){
-        return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join("") + '</select>';
-    } else {
-      html += '<input type="'+(f.t==="number"?"number":f.t==="date"?"date":"text")+'" data-name="'+f.n+'"'
-            + (f.t==="date" ? ' value="'+today()+'"' : '')
-            + (f.t==="number" ? ' min="0" step="any"' : '')
-            + (f.t==="text" ? ' placeholder="'+(f.n==="customer"?"اسم العميل":"اختياري")+'"' : '') + '>';
-    }
-    html += '</label>';
-  });
-  html += '</div><div class="cropinfo" id="cropInfo" hidden></div>'
+        + '<span class="panel-tag">'+(k.dept || "متعدد الأقسام")+'</span></div>'
+        + '<div class="formgrid" id="form">' + fieldsHTML(state.kind, null) + '</div>'
+        + '<div class="cropinfo" id="cropInfo" hidden></div>'
         + '<p class="hint" id="formHint"></p><p class="err" id="formErr" hidden></p>'
         + '<div class="actions"><button class="btn gold" data-act="save">حفظ السجل</button>'
         + '<button class="btn ghost" data-act="clear">تفريغ الحقول</button></div></div>';
@@ -727,7 +812,9 @@ function pageEntry(){
     html += '<ul class="feed">' + recent.map(function(r){
       return '<li><span>'+KINDS[r.kind].icon+'</span><span class="fd">'+esc(r.date)+'</span>'
            + '<span class="ft">'+esc(describe(r))+'</span>'
-           + '<button class="linkbtn" data-act="del" data-id="'+r.id+'">حذف</button></li>'; }).join("") + '</ul>';
+           + '<span class="rowbtns"><button class="linkbtn" data-act="edit" data-id="'+r.id+'">تعديل</button>'
+           + '<button class="linkbtn" data-act="del" data-id="'+r.id+'">حذف</button></span></li>'; }).join("")
+      + '</ul><p class="hint">لإدارة كل السجلات — بحث وفرز وتعديل وحذف جماعي — افتح تبويب التقارير.</p>';
   }
   html += '</div>';
 
@@ -740,8 +827,56 @@ function pageEntry(){
   return html;
 }
 
+/* نموذج واحد يخدم صفحة الإدخال ونافذة التعديل معاً */
+function fieldsHTML(kind, vals){
+  var k = KINDS[kind], v = vals || {}, html = "";
+  var seed = {}; k.fields.forEach(function(x){ if (x.t === "select") seed[x.n] = x.o[0]; });
+  var ref = vals || seed;
+  k.fields.forEach(function(f){
+    var unit = unitOf(ref, f);
+    var val = v[f.n] !== undefined && v[f.n] !== null ? String(v[f.n]) : "";
+    html += '<label class="field'+(f.wide?" wide":"")+'"><span class="flabel">'+f.l
+          + (unit ? '<em class="unit" data-unit="'+f.n+'">'+unit+'</em>' : '') + '</span>';
+    if (f.t === "select"){
+      html += '<select data-name="'+f.n+'">' + f.o.map(function(o){
+        return '<option value="'+esc(o)+'"'+(val === o ? " selected" : "")+'>'+esc(o)+'</option>';
+      }).join("") + '</select>';
+    } else {
+      if (f.t === "date" && !val) val = today();
+      html += '<input type="'+(f.t==="number"?"number":f.t==="date"?"date":"text")+'" data-name="'+f.n+'"'
+            + ' value="'+esc(val)+'"'
+            + (f.t==="number" ? ' min="0" step="any"' : '')
+            + (f.t==="text" ? ' placeholder="'+(f.n==="customer"?"اسم العميل":"اختياري")+'"' : '') + '>';
+    }
+    html += '</label>';
+  });
+  return html;
+}
+
+/* عناصر النموذج النشط — صفحة الإدخال أو نافذة التعديل */
+function fSel(){ return state.editId ? "#editForm" : "#form"; }
+function elCrop(){ return document.getElementById(state.editId ? "editCropInfo" : "cropInfo"); }
+function elHint(){ return document.getElementById(state.editId ? "editHint" : "formHint"); }
+function elErr(){  return document.getElementById(state.editId ? "editErr" : "formErr"); }
+
+function openEdit(id){
+  var r = recById(id); if (!r) return;
+  state.editId = id; state.formKind = r.kind;
+  document.getElementById("editTitle").textContent = "تعديل — " + KINDS[r.kind].icon + " " + KINDS[r.kind].label;
+  document.getElementById("editMeta").textContent = "القسم: " + deptOf(r) + " · التاريخ المسجَّل " + r.date;
+  document.getElementById("editForm").innerHTML = fieldsHTML(r.kind, r);
+  document.getElementById("editErr").hidden = true;
+  document.getElementById("editModal").hidden = false;
+  refreshDynamic();
+}
+function closeEdit(){
+  state.editId = null; state.formKind = state.kind;
+  document.getElementById("editModal").hidden = true;
+  document.getElementById("editForm").innerHTML = "";
+}
+
 function readForm(){
-  var rec = { kind:state.kind }, nodes = document.querySelectorAll("#form [data-name]"), i;
+  var rec = { kind:state.formKind }, nodes = document.querySelectorAll(fSel()+" [data-name]"), i;
   for (i=0;i<nodes.length;i++) rec[nodes[i].getAttribute("data-name")] = nodes[i].value;
   rec.id = uid();
   return rec;
@@ -751,7 +886,7 @@ function setField(name, value){
   if (el && !el.value) el.value = value;
 }
 function refreshDynamic(){
-  var k = KINDS[state.kind], cur = readForm();
+  var k = KINDS[state.formKind], cur = readForm();
   k.fields.forEach(function(f){
     if (!f.dyn) return;
     var el = document.querySelector('[data-unit="'+f.n+'"]');
@@ -761,7 +896,7 @@ function refreshDynamic(){
   /* بطاقة معلومات المحصول */
   var box = document.getElementById("cropInfo");
   if (box){
-    if (state.kind === "planting"){
+    if (state.formKind === "planting"){
       var c = cropByName(cur.crop);
       if (c){
         var m = parseInt((cur.date||today()).slice(5,7),10);
@@ -787,7 +922,7 @@ function refreshDynamic(){
   }
 
   /* تعبئة سعر منتج الورشة تلقائياً */
-  if (state.kind === "workshop"){
+  if (state.formKind === "workshop"){
     var p = workPrice(cur.product);
     var pe = document.querySelector('#form [data-name="price"]');
     if (pe && p > 0 && (pe.value === "" || pe.getAttribute("data-auto") === "1")){
@@ -797,35 +932,41 @@ function refreshDynamic(){
 
   var hint = document.getElementById("formHint"); if (!hint) return;
   var t = "";
-  if (state.kind === "nurseryOps" && OPS[cur.opType]) t = OPS[cur.opType].hint;
-  else if (state.kind === "livestock" && FLOCK[cur.category]) t = FLOCK[cur.category].hint;
-  else if (state.kind === "equipment" && EQUIP_OPS[cur.opType]){
+  if (state.formKind === "nurseryOps" && OPS[cur.opType]) t = OPS[cur.opType].hint;
+  else if (state.formKind === "livestock" && FLOCK[cur.category]) t = FLOCK[cur.category].hint;
+  else if (state.formKind === "equipment" && EQUIP_OPS[cur.opType]){
     t = EQUIP_OPS[cur.opType].hint;
     if (cur.opType !== "صيانة") t += "  الإيراد: "+money(num(cur.qty)*num(cur.price))+" "+KWD;
   }
-  else if (state.kind === "workshop"){
+  else if (state.formKind === "workshop"){
     var lp = workPrice(cur.product);
     t = (lp > 0 ? "سعر القائمة "+money(lp)+" "+KWD+" · " : "")
       + "قيمة العمل: "+money(num(cur.qty)*num(cur.price))+" "+KWD
       + " · الربح: "+money(num(cur.qty)*num(cur.price)-num(cur.cost))+" "+KWD;
   }
-  else if (state.kind === "contract") t = cur.status === "قيد التنفيذ"
+  else if (state.formKind === "contract") t = cur.status === "قيد التنفيذ"
     ? "العقد قيد التنفيذ — لا تُحتسب قيمته ضمن الإيرادات حتى يكتمل."
     : "الربح من العقد: "+money(num(cur.value)-num(cur.cost))+" "+KWD;
-  else if (state.kind === "sales") t = "قيمة هذه المبيعة: "+money(num(cur.qty)*num(cur.price))+" "+KWD;
+  else if (state.formKind === "sales") t = "قيمة هذه المبيعة: "+money(num(cur.qty)*num(cur.price))+" "+KWD;
   hint.textContent = t;
 }
 function submitForm(){
   var rec = readForm(), err = document.getElementById("formErr"), msg = "";
-  var hasQty = KINDS[state.kind].fields.some(function(f){ return f.n === "qty"; });
+  var hasQty = KINDS[state.formKind].fields.some(function(f){ return f.n === "qty"; });
   if (!rec.date) msg = "أدخل التاريخ قبل الحفظ.";
   else if (hasQty && num(rec.qty) <= 0) msg = "أدخل مقداراً أكبر من صفر.";
-  else if (state.kind === "expense" && num(rec.cost) <= 0) msg = "أدخل مبلغ المصروف.";
-  else if (state.kind === "contract" && num(rec.value) <= 0) msg = "أدخل قيمة العقد.";
-  else if ((state.kind === "sales" || state.kind === "workshop") && num(rec.price) <= 0) msg = "أدخل السعر.";
-  else if (state.kind === "equipment" && rec.opType !== "صيانة" && num(rec.price) <= 0) msg = "أدخل الأجرة أو سعر البيع.";
+  else if (state.formKind === "expense" && num(rec.cost) <= 0) msg = "أدخل مبلغ المصروف.";
+  else if (state.formKind === "contract" && num(rec.value) <= 0) msg = "أدخل قيمة العقد.";
+  else if ((state.formKind === "sales" || state.formKind === "workshop") && num(rec.price) <= 0) msg = "أدخل السعر.";
+  else if (state.formKind === "equipment" && rec.opType !== "صيانة" && num(rec.price) <= 0) msg = "أدخل الأجرة أو سعر البيع.";
   if (msg){ err.textContent = msg; err.hidden = false; return; }
-  err.hidden = true; addRecord(rec); render(); toast("تم حفظ السجل");
+  err.hidden = true;
+  if (state.editId){
+    updateRecord(state.editId, rec);
+    closeEdit(); render(); toast("تم حفظ التعديل");
+  } else {
+    addRecord(rec); render(); toast("تم حفظ السجل");
+  }
 }
 
 /* ============================================================
@@ -893,26 +1034,482 @@ function pageCalendar(){
 }
 
 /* ============================================================
+   الصفحة الفنية — دراسة جدوى لمحصول قبل زراعته
+   ============================================================ */
+var STUDY_KEY = "mazraati_studies_v1";
+
+function blankStudy(){
+  return { id:uid(),
+    /* المحددات */
+    start: today(), area: "", crop: CROPS.length ? CROPS[0].n : "",
+    /* المصروفات */
+    hours: "", wage: "", seeds: "", pest: "", fert: "", other: "",
+    /* الإيرادات */
+    expected: "",
+    note: "" };
+}
+
+var STUDY_FIELDS = {
+  limits: { t:"المحددات", i:"📌", f:[
+    { n:"start", l:"تاريخ البدء",      t:"date" },
+    { n:"area",  l:"المساحة الزراعية", t:"number", u:"دونم" },
+    { n:"crop",  l:"نوع المحصول",      t:"select" }
+  ]},
+  costs: { t:"المصروفات", i:"🧾", f:[
+    { n:"hours", l:"ساعات العمال", t:"number", u:"ساعة" },
+    { n:"wage",  l:"أجرة الساعة",  t:"number", u:KWD },
+    { n:"seeds", l:"البذور",       t:"number", u:KWD },
+    { n:"pest",  l:"المبيدات",     t:"number", u:KWD },
+    { n:"fert",  l:"السماد",       t:"number", u:KWD },
+    { n:"other", l:"مصروفات أخرى", t:"number", u:KWD }
+  ]},
+  income: { t:"الإيرادات", i:"📈", f:[
+    { n:"expected", l:"البيع المتوقع", t:"number", u:KWD },
+    { n:"note",     l:"ملاحظة",        t:"text", wide:true }
+  ]}
+};
+
+var COST_KEYS = [
+  { n:"labour", l:"أجور العمال", c:"#b9663f" },
+  { n:"seeds",  l:"البذور",      c:"#7d9a63" },
+  { n:"pest",   l:"المبيدات",    c:"#6f8fa6" },
+  { n:"fert",   l:"السماد",      c:"#d9a441" },
+  { n:"other",  l:"أخرى",        c:"#8a8f98" }
+];
+
+/* كل حسابات الدراسة في مكان واحد */
+function studyCalc(s){
+  var labour = num(s.hours) * num(s.wage);
+  var parts = { labour:labour, seeds:num(s.seeds), pest:num(s.pest), fert:num(s.fert), other:num(s.other) };
+  var total = labour + parts.seeds + parts.pest + parts.fert + parts.other;
+  var rev = num(s.expected);
+  var net = rev - total;
+  var area = num(s.area);
+  var c = cropByName(s.crop);
+  var harvest = null, harvestLate = null, days = 0, inSeason = null, months = [];
+  if (c){
+    months = c.m;
+    if (s.start && c.d[0]){
+      days = c.d[0];
+      harvest = addDays(s.start, c.d[0]);
+      harvestLate = addDays(s.start, c.d[1] || c.d[0]);
+    }
+    if (s.start && c.m.length) inSeason = c.m.indexOf(parseInt(s.start.slice(5,7),10)) >= 0;
+  }
+  return {
+    crop:c, parts:parts, total:total, rev:rev, net:net, area:area,
+    margin: rev > 0 ? (net/rev)*100 : null,
+    roi: total > 0 ? (net/total)*100 : null,
+    costPerDunum: area > 0 ? total/area : null,
+    revPerDunum: area > 0 ? rev/area : null,
+    netPerDunum: area > 0 ? net/area : null,
+    breakEven: total,
+    breakEvenPerDunum: area > 0 ? total/area : null,
+    coverage: total > 0 ? Math.min(200, (rev/total)*100) : 0,
+    harvest:harvest, harvestLate:harvestLate, days:days, inSeason:inSeason, months:months,
+    dailyCost: days > 0 ? total/days : null
+  };
+}
+
+function loadStudies(cb){
+  try {
+    if (window.storage){
+      window.storage.get(STUDY_KEY).then(function(res){
+        if (res && res.value) try { state.studies = JSON.parse(res.value) || []; } catch(e){}
+        cb();
+      })["catch"](function(){ cb(); });
+      return;
+    }
+    var v = localStorage.getItem(STUDY_KEY);
+    if (v) state.studies = JSON.parse(v) || [];
+  } catch(e){}
+  cb();
+}
+function saveStudies(){
+  try { if (window.storage) window.storage.set(STUDY_KEY, JSON.stringify(state.studies));
+        else localStorage.setItem(STUDY_KEY, JSON.stringify(state.studies)); } catch(e){}
+}
+
+function studyFieldsHTML(){
+  var s = state.study, html = "";
+  Object.keys(STUDY_FIELDS).forEach(function(gk){
+    var g = STUDY_FIELDS[gk];
+    html += '<div class="group"><h4>'+g.i+' '+g.t+'</h4><div class="formgrid">';
+    g.f.forEach(function(f){
+      var val = s[f.n] === undefined || s[f.n] === null ? "" : String(s[f.n]);
+      html += '<label class="field'+(f.wide?" wide":"")+'"><span class="flabel">'+f.l
+            + (f.u ? '<em class="unit">'+f.u+'</em>' : '') + '</span>';
+      if (f.t === "select"){
+        html += '<select data-sf="'+f.n+'">' + CROPS.map(function(c){
+          return '<option value="'+esc(c.n)+'"'+(val === c.n ? " selected" : "")+'>'+esc(c.n)+'</option>';
+        }).join("") + '</select>';
+      } else {
+        html += '<input type="'+(f.t==="number"?"number":f.t==="date"?"date":"text")+'" data-sf="'+f.n+'"'
+              + ' value="'+esc(val)+'"'
+              + (f.t==="number" ? ' min="0" step="any" placeholder="0"' : '')
+              + (f.t==="text" ? ' placeholder="اختياري"' : '') + '>';
+      }
+      html += '</label>';
+    });
+    html += '</div></div>';
+  });
+  return html;
+}
+
+function studyResultHTML(){
+  var s = state.study, k = studyCalc(s);
+  var hasAny = k.total > 0 || k.rev > 0;
+  var tone = k.net > 0 ? "good" : k.net < 0 ? "bad" : "";
+
+  var html = '<section class="panel resultcard"><div class="panel-head"><h3>النتيجة</h3>'
+    + '<span class="panel-tag">'+esc(s.crop || "—")+'</span></div>';
+
+  html += '<div class="bigresult"><span class="lbl">صافي الربح المتوقع</span>'
+    + '<b class="val '+tone+'">'+(hasAny ? money(k.net) : "—")+'</b>'
+    + '<span class="sub">'+KWD+(k.margin !== null ? ' · هامش '+fmt(k.margin)+'%' : '')+'</span></div>';
+
+  if (k.total > 0){
+    html += '<div class="costbar">' + COST_KEYS.map(function(c){
+      var v = k.parts[c.n]; if (!v) return "";
+      return '<span style="width:'+(v/k.total*100).toFixed(2)+'%; background:'+c.c+'" title="'+esc(c.l)+'"></span>';
+    }).join("") + '</div>';
+    html += '<div class="costkey">' + COST_KEYS.filter(function(c){ return k.parts[c.n] > 0; })
+      .map(function(c){
+        return '<span><i style="background:'+c.c+'"></i>'+c.l+' '+fmt(k.parts[c.n]/k.total*100)+'%</span>';
+      }).join("") + '</div>';
+  }
+
+  if (k.total > 0){
+    var pct = Math.min(100, k.coverage);
+    html += '<div class="gauge"><div class="track"><div class="fill" style="width:'+pct.toFixed(1)+'%; background:'
+      + (k.coverage >= 100 ? "var(--green)" : "var(--clay)") + '"></div></div>'
+      + '<div class="cap"><span>تغطية البيع للتكاليف</span><span>'+fmt(k.coverage)+'%</span></div></div>';
+  }
+
+  html += '<table class="minitable"><tbody>'
+    + row2("إجمالي المصروفات", money(k.total)+" "+KWD)
+    + row2("أجور العمال", money(k.parts.labour)+" "+KWD)
+    + row2("البيع المتوقع", money(k.rev)+" "+KWD)
+    + row2("نقطة التعادل", money(k.breakEven)+" "+KWD)
+    + row2("العائد على التكلفة", k.roi !== null ? fmt(k.roi)+"%" : "—")
+    + (k.area > 0 ? row2("تكلفة الدونم", money(k.costPerDunum)+" "+KWD) : "")
+    + (k.area > 0 ? row2("إيراد الدونم", money(k.revPerDunum)+" "+KWD) : "")
+    + (k.area > 0 ? row2("ربح الدونم", money(k.netPerDunum)+" "+KWD) : "")
+    + (k.days ? row2("مدة الدورة", fmt(k.days)+" يوم") : "")
+    + (k.dailyCost !== null ? row2("تكلفة اليوم الواحد", money(k.dailyCost)+" "+KWD) : "")
+    + '</tbody></table>';
+
+  if (k.crop){
+    html += '<div class="cropinfo" style="margin-top:16px"><dl>'
+      + '<div><dt>موعد الزراعة</dt><dd>'+esc(k.crop.p || "—")+'</dd></div>'
+      + '<div><dt>مسافات الزراعة</dt><dd>'+esc(k.crop.s || "—")+'</dd></div>'
+      + '<div><dt>التقاوي للدونم</dt><dd>'+esc(k.crop.q || "—")+'</dd></div>'
+      + '<div><dt>أيام حتى الحصاد</dt><dd>'+(k.crop.d[0] ? k.crop.d[0]+" - "+k.crop.d[1]+" يوم" : "—")+'</dd></div>'
+      + (k.harvest ? '<div><dt>الحصاد المتوقع</dt><dd>'+k.harvest+' إلى '+k.harvestLate+'</dd></div>' : '')
+      + '</dl>'
+      + (k.crop.g ? '<p class="hint">'+esc(k.crop.g)+'</p>' : '')
+      + (k.inSeason === null ? '' :
+         '<p class="season '+(k.inSeason?"ok":"no")+'">'
+         + (k.inSeason ? "✔ تاريخ البدء ضمن الموسم المناسب لهذا المحصول."
+                       : "⚠ تاريخ البدء خارج الموسم. الشهور المناسبة: "
+                         + k.months.map(function(x){ return MONTHS_AR[x]; }).join("، ")) + '</p>')
+      + '</div>';
+  }
+  html += '</section>';
+  return html;
+}
+
+/* قراءة الدراسة الحالية كتوصيات قصيرة */
+function studyAdvice(){
+  var s = state.study, k = studyCalc(s), out = [];
+  function add(t,title,body,ev){ out.push({type:t, area:"الدراسة", title:title, body:body, evidence:ev}); }
+
+  if (!k.total && !k.rev) return out;
+
+  if (k.rev > 0 && k.net < 0)
+    add("alert","الدراسة خاسرة بهذه الأرقام",
+      "البيع المتوقع لا يغطي المصروفات. ارفع سعر البيع المستهدف، أو اخفض أكبر بند في المصروفات، أو وسّع المساحة لتوزيع التكلفة الثابتة.",
+      "عجز "+money(Math.abs(k.net))+" "+KWD+" · التغطية "+fmt(k.coverage)+"%");
+  else if (k.rev > 0 && k.margin !== null && k.margin < 20)
+    add("opp","الهامش ضعيف",
+      "هامش أقل من 20% لا يحتمل أي تأخير أو آفة أو انخفاض سعر عند الحصاد. راجع الأرقام قبل الالتزام.",
+      "الهامش "+fmt(k.margin)+"% · العائد على التكلفة "+fmt(k.roi)+"%");
+  else if (k.rev > 0)
+    add("ok","الدراسة مجدية",
+      "الأرقام تحتمل تقلباً معقولاً في السعر أو الإنتاج. ثبّت مشتري الكمية قبل الزراعة إن أمكن.",
+      "الهامش "+fmt(k.margin)+"% · ربح الدونم "+(k.netPerDunum!==null?money(k.netPerDunum)+" "+KWD:"—"));
+
+  if (!k.rev && k.total > 0)
+    add("opp","لم تُدخل البيع المتوقع",
+      "أدخل قيمة البيع المتوقعة ليحسب التطبيق الربح ونقطة التعادل.",
+      "المصروفات حتى الآن "+money(k.total)+" "+KWD);
+
+  if (k.total > 0){
+    var top = COST_KEYS.map(function(c){ return { l:c.l, v:k.parts[c.n] }; })
+      .sort(function(a,b){ return b.v-a.v; })[0];
+    if (top && top.v/k.total > 0.5)
+      add("opp","بند «"+top.l+"» يستحوذ على أكثر من نصف التكلفة",
+        "أي توفير في هذا البند وحده يغيّر نتيجة الدراسة. اطلب عرضين بديلين قبل الشراء.",
+        money(top.v)+" من "+money(k.total)+" "+KWD+" ("+fmt(top.v/k.total*100)+"%)");
+  }
+  if (num(s.hours) > 0 && num(s.wage) <= 0)
+    add("opp","أجرة الساعة غير مُدخلة",
+      "ساعات العمال مسجّلة بلا أجرة، فلا تُحتسب ضمن التكلفة والنتيجة أعلى من الحقيقة.",
+      fmt(s.hours)+" ساعة بلا تكلفة");
+  if (k.inSeason === false)
+    add("alert","تاريخ البدء خارج موسم المحصول",
+      "الزراعة خارج الموسم تحتاج حماية إضافية وتعطي إنتاجاً أقل، وهذا لا ينعكس في أرقام الدراسة.",
+      "الشهور المناسبة: "+k.months.map(function(x){ return MONTHS_AR[x]; }).join("، "));
+  if (!k.area)
+    add("opp","المساحة غير مُدخلة",
+      "بدون المساحة لا يمكن حساب تكلفة الدونم ولا مقارنة هذه الدراسة بغيرها.", null);
+  if (k.crop && k.crop.q && k.area > 0)
+    add("ok","كمية التقاوي المطلوبة",
+      "حسب التقويم الزراعي، احسب التقاوي على أساس «"+k.crop.q+"» للدونم الواحد × "+fmt(k.area)+" دونم.",
+      null);
+  return out;
+}
+
+function pageStudy(){
+  var s = state.study, k = studyCalc(s);
+  var html = sechead("دراسة جدوى","الصفحة الفنية",
+    "أدخل محددات الزراعة والمصروفات والبيع المتوقع، فتُحسب التكلفة والربح ونقطة التعادل وتكلفة الدونم فوراً.");
+
+  html += '<div class="sgrid">';
+
+  html += '<div><div class="panel"><div class="panel-head"><h3>المدخلات</h3>'
+    + '<span class="panel-tag">'+(state.studyId ? "تعديل دراسة محفوظة" : "دراسة جديدة")+'</span></div>'
+    + studyFieldsHTML()
+    + '<div class="actions">'
+    + '<button class="btn gold" data-act="study-save">'+(state.studyId ? "حفظ التعديل" : "حفظ الدراسة")+'</button>'
+    + '<button class="btn ghost" data-act="study-new">دراسة جديدة</button>'
+    + (k.total > 0 || k.rev > 0 ? '<button class="btn ghost" data-act="study-csv">تصدير الدراسة</button>' : '')
+    + (state.studyId ? '<button class="btn ghost" data-act="study-del" data-id="'+state.studyId+'">حذف هذه الدراسة</button>' : '')
+    + '</div></div></div>';
+
+  html += '<div>' + studyResultHTML() + '</div>';
+  html += '</div>';
+
+  /* توصيات الدراسة */
+  var adv = studyAdvice();
+  if (adv.length){
+    html += '<div class="advgroup"><h3 class="advhead warn">قراءة الدراسة <span>'+adv.length+'</span></h3><div class="advlist">'
+      + adv.map(function(i){
+          var t = i.type === "alert" ? "bad" : i.type === "ok" ? "good" : "warn";
+          return '<article class="advcard '+t+'"><header><h4>'+esc(i.title)+'</h4></header>'
+            + '<p>'+esc(i.body)+'</p>'
+            + (i.evidence ? '<p class="evidence">'+esc(i.evidence)+'</p>' : '') + '</article>';
+        }).join("") + '</div></div>';
+  }
+
+  /* الدراسات المحفوظة */
+  html += '<div class="panel"><div class="panel-head"><h3>الدراسات المحفوظة</h3>'
+    + '<span class="panel-tag">'+state.studies.length+' دراسة</span></div>';
+  if (!state.studies.length){
+    html += '<div class="empty"><p>لا توجد دراسات محفوظة. املأ المدخلات أعلاه واضغط «حفظ الدراسة» للرجوع إليها لاحقاً ومقارنتها.</p></div>';
+  } else {
+    var list = state.studies.slice().sort(function(a,b){ return a.start < b.start ? 1 : -1; });
+    html += '<div class="tablewrap"><table class="tbl"><thead><tr>'
+      + '<th>المحصول</th><th>تاريخ البدء</th><th>المساحة</th><th>المصروفات</th>'
+      + '<th>البيع المتوقع</th><th>الصافي</th><th>الهامش</th><th>ربح الدونم</th><th></th></tr></thead><tbody>'
+      + list.map(function(x){
+          var c = studyCalc(x);
+          var tag = c.net > 0 ? '<span class="studytag good">مجدية</span>'
+                  : c.net < 0 ? '<span class="studytag bad">خاسرة</span>'
+                  : '<span class="studytag warn">غير مكتملة</span>';
+          return '<tr'+(state.studyId===x.id?' class="picked"':'')+'>'
+            + '<td><b>'+esc(x.crop||"—")+'</b>'+tag+'</td>'
+            + '<td class="mono">'+esc(x.start||"—")+'</td>'
+            + '<td class="mono">'+(num(x.area)?fmt(x.area)+" دونم":"—")+'</td>'
+            + '<td class="mono warn">'+money(c.total)+'</td>'
+            + '<td class="mono good">'+money(c.rev)+'</td>'
+            + '<td class="mono '+(c.net>=0?"good":"warn")+'">'+money(c.net)+'</td>'
+            + '<td class="mono">'+(c.margin!==null?fmt(c.margin)+"%":"—")+'</td>'
+            + '<td class="mono">'+(c.netPerDunum!==null?money(c.netPerDunum):"—")+'</td>'
+            + '<td><span class="rowbtns">'
+            + '<button class="linkbtn" data-act="study-open" data-id="'+x.id+'">فتح</button>'
+            + '<button class="linkbtn" data-act="study-copy" data-id="'+x.id+'">نسخ</button>'
+            + '<button class="linkbtn" data-act="study-del" data-id="'+x.id+'">حذف</button>'
+            + '</span></td></tr>';
+        }).join("")
+      + '</tbody></table></div>';
+
+    /* مقارنة ربح الدونم */
+    var cmp = list.filter(function(x){ return studyCalc(x).netPerDunum !== null; })
+      .map(function(x){ return { name:x.crop, value:Math.round(studyCalc(x).netPerDunum) }; })
+      .sort(function(a,b){ return b.value-a.value; }).slice(0,8);
+    if (cmp.length > 1)
+      html += '<div style="margin-top:20px">' + hBars(cmp, "#7d9a63", KWD, true)
+            + '<p class="cardnote">ربح الدونم الواحد في كل دراسة — الأعلى أولاً.</p></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function studySave(){
+  var s = state.study, k = studyCalc(s);
+  if (!k.total && !k.rev){ toast("أدخل المصروفات أو البيع المتوقع قبل الحفظ"); return; }
+  var copy = JSON.parse(JSON.stringify(s));
+  if (state.studyId){
+    for (var i=0;i<state.studies.length;i++)
+      if (state.studies[i].id === state.studyId){ copy.id = state.studyId; state.studies[i] = copy; break; }
+    toast("تم حفظ التعديل");
+  } else {
+    copy.id = uid(); state.studies.unshift(copy); state.studyId = copy.id;
+    state.study = copy;
+    toast("تم حفظ الدراسة");
+  }
+  saveStudies(); render();
+}
+function studyOpen(id){
+  for (var i=0;i<state.studies.length;i++)
+    if (state.studies[i].id === id){
+      state.study = JSON.parse(JSON.stringify(state.studies[i]));
+      state.studyId = id; render(); return;
+    }
+}
+function studyCopy(id){
+  for (var i=0;i<state.studies.length;i++)
+    if (state.studies[i].id === id){
+      var c = JSON.parse(JSON.stringify(state.studies[i]));
+      c.id = uid(); state.study = c; state.studyId = null;
+      render(); toast("نسخة جديدة — عدّل الأرقام ثم احفظها"); return;
+    }
+}
+function studyDelete(id){
+  var s = null, i;
+  for (i=0;i<state.studies.length;i++) if (state.studies[i].id === id) s = state.studies[i];
+  if (!s) return;
+  if (!confirm("حذف دراسة «"+(s.crop||"—")+"» نهائياً؟")) return;
+  state.studies = state.studies.filter(function(x){ return x.id !== id; });
+  if (state.studyId === id){ state.studyId = null; state.study = blankStudy(); }
+  saveStudies(); render(); toast("تم حذف الدراسة");
+}
+function studyNew(){ state.study = blankStudy(); state.studyId = null; render(); }
+function studyCsv(){
+  var s = state.study, k = studyCalc(s);
+  var L = [["البند","القيمة"],
+    ["المحصول", s.crop],
+    ["تاريخ البدء", s.start],
+    ["المساحة الزراعية (دونم)", num(s.area)],
+    ["ساعات العمال", num(s.hours)],
+    ["أجرة الساعة ("+KWD+")", num(s.wage)],
+    ["أجور العمال ("+KWD+")", k.parts.labour.toFixed(3)],
+    ["البذور ("+KWD+")", num(s.seeds).toFixed(3)],
+    ["المبيدات ("+KWD+")", num(s.pest).toFixed(3)],
+    ["السماد ("+KWD+")", num(s.fert).toFixed(3)],
+    ["مصروفات أخرى ("+KWD+")", num(s.other).toFixed(3)],
+    ["إجمالي المصروفات ("+KWD+")", k.total.toFixed(3)],
+    ["البيع المتوقع ("+KWD+")", k.rev.toFixed(3)],
+    ["صافي الربح ("+KWD+")", k.net.toFixed(3)],
+    ["هامش الربح (%)", k.margin !== null ? k.margin.toFixed(1) : ""],
+    ["العائد على التكلفة (%)", k.roi !== null ? k.roi.toFixed(1) : ""],
+    ["نقطة التعادل ("+KWD+")", k.breakEven.toFixed(3)],
+    ["تكلفة الدونم ("+KWD+")", k.costPerDunum !== null ? k.costPerDunum.toFixed(3) : ""],
+    ["ربح الدونم ("+KWD+")", k.netPerDunum !== null ? k.netPerDunum.toFixed(3) : ""],
+    ["الحصاد المتوقع", k.harvest ? k.harvest+" إلى "+k.harvestLate : ""],
+    ["ملاحظة", s.note||""]];
+  var text = "﻿" + L.map(function(r){ return r[0]+',"'+r[1]+'"'; }).join("\n");
+  download("دراسة-"+(s.crop||"محصول")+".csv", text, "text/csv;charset=utf-8");
+  openModal("الدراسة الفنية","إذا لم يبدأ التنزيل تلقائياً، انسخ المحتوى التالي والصقه في جدول بيانات.", text, false);
+}
+
+/* ============================================================
    ٣) التقارير
    ============================================================ */
+function quickRange(){
+  var n = new Date(), y = n.getFullYear(), m = n.getMonth(), d = n.getDate();
+  function iso(x){ return new Date(x.getTime() - x.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+  if (state.quick === "today")  return { from:iso(n), to:iso(n) };
+  if (state.quick === "week")   return { from:iso(new Date(y,m,d-6)), to:iso(n) };
+  if (state.quick === "month")  return { from:iso(new Date(y,m,1)), to:iso(n) };
+  if (state.quick === "quarter")return { from:iso(new Date(y,m-2,1)), to:iso(n) };
+  if (state.quick === "year")   return { from:iso(new Date(y,0,1)), to:iso(n) };
+  return null;
+}
+function searchText(r){
+  return describe(r) + " " + (r.note||"") + " " + (r.customer||"") + " "
+       + deptOf(r) + " " + KINDS[r.kind].label + " " + r.date;
+}
+/* بحث بعدة كلمات — كل كلمة يجب أن توجد */
+function matchesQuery(r, q){
+  var hay = searchText(r), parts = q.split(/\s+/).filter(Boolean), i;
+  for (i=0;i<parts.length;i++) if (hay.indexOf(parts[i]) < 0) return false;
+  return true;
+}
+function sortValue(r, key){
+  if (key === "date") return r.date || "";
+  if (key === "dept") return deptOf(r);
+  if (key === "kind") return KINDS[r.kind].label;
+  if (key === "rev")  return revenueOf(r);
+  if (key === "cost") return costOf(r);
+  if (key === "net")  return revenueOf(r) - costOf(r);
+  return "";
+}
 function filteredRows(){
-  var f = state.filters;
-  return state.records.filter(function(r){
+  var f = state.filters, qr = quickRange();
+  var from = qr ? qr.from : f.from, to = qr ? qr.to : f.to;
+  var rows = state.records.filter(function(r){
     if (f.kind !== "all" && r.kind !== f.kind) return false;
     if (f.dept !== "all" && deptOf(r) !== f.dept) return false;
-    if (f.from && r.date < f.from) return false;
-    if (f.to && r.date > f.to) return false;
-    if (f.q && describe(r).indexOf(f.q) < 0 && (r.note||"").indexOf(f.q) < 0) return false;
+    if (from && r.date < from) return false;
+    if (to && r.date > to) return false;
+    if (f.q && !matchesQuery(r, f.q)) return false;
     return true;
-  }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+  });
+  var k = state.sortKey, dir = state.sortDir === "asc" ? 1 : -1;
+  rows.sort(function(a,b){
+    var x = sortValue(a,k), y = sortValue(b,k);
+    if (typeof x === "number") return (x-y)*dir;
+    return x < y ? -dir : x > y ? dir : 0;
+  });
+  return rows;
+}
+function pageSlice(rows){
+  var total = Math.max(1, Math.ceil(rows.length / state.per));
+  if (state.page > total) state.page = total;
+  if (state.page < 1) state.page = 1;
+  var start = (state.page-1) * state.per;
+  return { total:total, start:start, items:rows.slice(start, start + state.per) };
+}
+function pagerHTML(rows, sl){
+  if (!rows.length) return "";
+  var t = sl.total, p = state.page, nums = [], i;
+  var lo = Math.max(1, p-2), hi = Math.min(t, lo+4); lo = Math.max(1, hi-4);
+  for (i=lo;i<=hi;i++) nums.push(i);
+  return '<div class="pager">'
+    + '<span class="pinfo">عرض '+(sl.start+1)+' – '+Math.min(sl.start+state.per, rows.length)+' من '+rows.length+' سجل</span>'
+    + '<span class="pbtns">'
+    + '<button class="pbtn" data-act="page" data-page="1"'+(p===1?" disabled":"")+'>الأولى</button>'
+    + '<button class="pbtn" data-act="page" data-page="'+(p-1)+'"'+(p===1?" disabled":"")+'>السابق</button>'
+    + nums.map(function(n){ return '<button class="pbtn'+(n===p?" on":"")+'" data-act="page" data-page="'+n+'">'+n+'</button>'; }).join("")
+    + '<button class="pbtn" data-act="page" data-page="'+(p+1)+'"'+(p===t?" disabled":"")+'>التالي</button>'
+    + '<button class="pbtn" data-act="page" data-page="'+t+'"'+(p===t?" disabled":"")+'>الأخيرة</button>'
+    + '</span>'
+    + '<label class="pinfo">لكل صفحة '
+    + '<select data-per="1" style="width:auto; display:inline-block; padding:4px 8px; margin-inline-start:6px">'
+    + [10,25,50,100,250].map(function(n){ return '<option value="'+n+'"'+(state.per===n?" selected":"")+'>'+n+'</option>'; }).join("")
+    + '</select></label></div>';
+}
+function sortTh(key, label, cls){
+  var on = state.sortKey === key;
+  return '<th class="sortable '+(cls||"")+'" data-act="sort" data-key="'+key+'">'+label
+    + (on ? ' <span class="arrow">'+(state.sortDir==="asc"?"▲":"▼")+'</span>' : '') + '</th>';
 }
 function pageReports(){
   var rows = filteredRows(), f = state.filters;
   var rev = rows.reduce(function(s,r){ return s+revenueOf(r); },0);
   var cost = rows.reduce(function(s,r){ return s+costOf(r); },0);
+  var sl = pageSlice(rows);
 
-  var html = sechead("السجل الكامل","التقارير",
-    "اختر القسم والفترة ونوع السجل لاستخراج تقرير مفصّل بالإيرادات والتكاليف.");
+  var html = sechead("السجل الكامل","التقارير وإدارة السجلات",
+    "ابحث وافرز وعدّل واحذف أي سجل. الأرقام في الأعلى تتبع نتيجة البحث الحالية.");
+
+  var QUICK = [["","كل الفترات"],["today","اليوم"],["week","آخر 7 أيام"],
+               ["month","هذا الشهر"],["quarter","آخر 3 أشهر"],["year","هذه السنة"]];
+  html += '<div class="chiprow">' + QUICK.map(function(q){
+    return '<button class="qchip'+(state.quick===q[0]?" on":"")+'" data-act="quick" data-q="'+q[0]+'">'+q[1]+'</button>';
+  }).join("") + '</div>';
 
   html += '<div class="filters">'
     + '<label class="field"><span class="flabel">القسم</span><select data-filter="dept">'
@@ -924,35 +1521,58 @@ function pageReports(){
     + Object.keys(KINDS).map(function(k){
         return '<option value="'+k+'"'+(f.kind===k?" selected":"")+'>'+KINDS[k].label+'</option>'; }).join("")
     + '</select></label>'
-    + '<label class="field"><span class="flabel">من تاريخ</span><input type="date" data-filter="from" value="'+esc(f.from)+'"></label>'
-    + '<label class="field"><span class="flabel">إلى تاريخ</span><input type="date" data-filter="to" value="'+esc(f.to)+'"></label>'
+    + '<label class="field"><span class="flabel">من تاريخ</span><input type="date" data-filter="from" value="'+esc(f.from)+'"'+(state.quick?" disabled":"")+'></label>'
+    + '<label class="field"><span class="flabel">إلى تاريخ</span><input type="date" data-filter="to" value="'+esc(f.to)+'"'+(state.quick?" disabled":"")+'></label>'
     + '<label class="field"><span class="flabel">بحث</span><input type="text" data-filter="q" placeholder="عميل، معدة، محصول…" value="'+esc(f.q)+'"></label>'
     + '<div class="field"><span class="flabel">&nbsp;</span><button class="btn gold" data-act="csv"'+(rows.length?"":" disabled")+'>تصدير CSV</button></div>'
     + '</div>';
 
   html += '<div class="statstrip">'
-    + stat("عدد السجلات", NF.format(rows.length))
+    + stat("نتيجة البحث", NF.format(rows.length), "من "+state.records.length)
     + stat("الإيرادات", money(rev), KWD, "good")
     + stat("التكاليف", money(cost), KWD, "warn")
     + stat("الصافي", money(rev-cost), KWD, rev-cost>=0?"good":"bad") + '</div>';
 
+  var n = selCount();
+  html += '<div class="bulkbar"'+(n?"":" hidden")+'>'
+    + '<b>'+NF.format(n)+'</b> سجل محدد'
+    + '<button class="btn ghost" data-act="bulk-del">حذف المحدد</button>'
+    + '<button class="linkbtn" data-act="sel-none">إلغاء التحديد</button></div>';
+
   html += '<div class="panel">';
-  if (!rows.length) html += '<div class="empty"><p>لا توجد سجلات ضمن هذه الفترة. وسّع نطاق التاريخ أو غيّر القسم.</p></div>';
-  else html += '<div class="tablewrap"><table class="tbl"><thead><tr>'
-    + '<th>التاريخ</th><th>القسم</th><th>النوع</th><th>التفاصيل</th><th>الإيراد</th><th>التكلفة</th><th>ملاحظة</th><th></th>'
-    + '</tr></thead><tbody>'
-    + rows.map(function(r){
-        return '<tr><td class="mono">'+esc(r.date)+'</td>'
-          + '<td><span class="pill">'+esc(deptOf(r))+'</span></td>'
-          + '<td>'+KINDS[r.kind].icon+' '+KINDS[r.kind].label+'</td>'
-          + '<td>'+esc(describe(r))+'</td>'
-          + '<td class="mono good">'+(revenueOf(r)?money(revenueOf(r)):"—")+'</td>'
-          + '<td class="mono warn">'+(costOf(r)?money(costOf(r)):"—")+'</td>'
-          + '<td class="muted">'+(r.note?esc(r.note):"—")+'</td>'
-          + '<td><button class="linkbtn" data-act="del" data-id="'+r.id+'">حذف</button></td></tr>'; }).join("")
-    + '</tbody><tfoot><tr><td colspan="4">الإجمالي</td>'
-    + '<td class="mono good">'+money(rev)+'</td><td class="mono warn">'+money(cost)+'</td>'
-    + '<td colspan="2" class="mono">الصافي '+money(rev-cost)+' '+KWD+'</td></tr></tfoot></table></div>';
+  if (!rows.length){
+    html += '<div class="empty"><p>لا يوجد سجل مطابق. غيّر الفترة أو القسم، أو امسح كلمة البحث.</p>'
+          + (f.q || state.quick || f.dept !== "all" || f.kind !== "all" || f.from || f.to
+              ? '<button class="btn ghost" data-act="reset">مسح كل عوامل التصفية</button>' : '') + '</div>';
+  } else {
+    var allOn = sl.items.every(function(r){ return state.sel[r.id]; });
+    html += '<div class="tablewrap"><table class="tbl"><thead><tr>'
+      + '<th class="selcol"><input type="checkbox" data-act="sel-page"'+(allOn?" checked":"")+' title="تحديد الصفحة"></th>'
+      + sortTh("date","التاريخ") + sortTh("dept","القسم") + sortTh("kind","النوع")
+      + '<th>التفاصيل</th>'
+      + sortTh("rev","الإيراد") + sortTh("cost","التكلفة") + sortTh("net","الصافي")
+      + '<th>ملاحظة</th><th></th></tr></thead><tbody>'
+      + sl.items.map(function(r){
+          var rv = revenueOf(r), cs = costOf(r), nt = rv - cs, on = !!state.sel[r.id];
+          return '<tr'+(on?' class="picked"':'')+'>'
+            + '<td class="selcol"><input type="checkbox" data-act="sel" data-id="'+r.id+'"'+(on?" checked":"")+'></td>'
+            + '<td class="mono">'+esc(r.date)+'</td>'
+            + '<td><span class="pill">'+esc(deptOf(r))+'</span></td>'
+            + '<td>'+KINDS[r.kind].icon+' '+KINDS[r.kind].label+'</td>'
+            + '<td>'+esc(describe(r))+'</td>'
+            + '<td class="mono good">'+(rv?money(rv):"—")+'</td>'
+            + '<td class="mono warn">'+(cs?money(cs):"—")+'</td>'
+            + '<td class="mono '+(nt>=0?"good":"warn")+'">'+(rv||cs?money(nt):"—")+'</td>'
+            + '<td class="muted">'+(r.note?esc(r.note):"—")+'</td>'
+            + '<td><span class="rowbtns">'
+            + '<button class="linkbtn" data-act="edit" data-id="'+r.id+'">تعديل</button>'
+            + '<button class="linkbtn" data-act="del" data-id="'+r.id+'">حذف</button>'
+            + '</span></td></tr>'; }).join("")
+      + '</tbody><tfoot><tr><td colspan="5">إجمالي نتيجة البحث</td>'
+      + '<td class="mono good">'+money(rev)+'</td><td class="mono warn">'+money(cost)+'</td>'
+      + '<td class="mono">'+money(rev-cost)+'</td><td colspan="2" class="mono">'+KWD+'</td></tr></tfoot></table></div>'
+      + pagerHTML(rows, sl);
+  }
   html += '</div>';
   return html;
 }
@@ -1330,6 +1950,7 @@ function closeModal(){ document.getElementById("modal").hidden = true; }
 function render(){
   var p = document.getElementById("page");
   if (state.tab === "entry") p.innerHTML = pageEntry();
+  else if (state.tab === "study") p.innerHTML = pageStudy();
   else if (state.tab === "calendar") p.innerHTML = pageCalendar();
   else if (state.tab === "reports") p.innerHTML = pageReports();
   else if (state.tab === "analysis") p.innerHTML = pageAnalysis();
@@ -1349,10 +1970,44 @@ document.getElementById("tabs").addEventListener("click", function(e){
 document.addEventListener("click", function(e){
   var b = e.target.closest("[data-act]"); if (!b) return;
   var act = b.getAttribute("data-act");
-  if (act === "kind"){ state.kind = b.getAttribute("data-kind"); render(); }
+  if (act === "kind"){ state.kind = state.formKind = b.getAttribute("data-kind"); render(); }
   else if (act === "save") submitForm();
   else if (act === "clear") render();
   else if (act === "del") delRecord(b.getAttribute("data-id"));
+  else if (act === "edit") openEdit(b.getAttribute("data-id"));
+  else if (act === "edit-cancel") closeEdit();
+  else if (act === "edit-delete"){ var eid = state.editId; closeEdit(); delRecord(eid); }
+  else if (act === "sort"){
+    var key = b.getAttribute("data-key");
+    if (state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+    else { state.sortKey = key; state.sortDir = (key === "date") ? "desc" : "desc"; }
+    render();
+  }
+  else if (act === "page"){ state.page = parseInt(b.getAttribute("data-page"),10) || 1; render(); }
+  else if (act === "quick"){ state.quick = b.getAttribute("data-q"); state.page = 1; render(); }
+  else if (act === "reset"){
+    state.filters = { kind:"all", dept:"all", from:"", to:"", q:"" };
+    state.quick = ""; state.page = 1; clearSel(); render();
+  }
+  else if (act === "sel"){
+    var sid = b.getAttribute("data-id");
+    if (state.sel[sid]) delete state.sel[sid]; else state.sel[sid] = true;
+    render();
+  }
+  else if (act === "sel-page"){
+    var items = pageSlice(filteredRows()).items;
+    var allOn = items.every(function(r){ return state.sel[r.id]; });
+    items.forEach(function(r){ if (allOn) delete state.sel[r.id]; else state.sel[r.id] = true; });
+    render();
+  }
+  else if (act === "sel-none"){ clearSel(); render(); }
+  else if (act === "study-save") studySave();
+  else if (act === "study-new") studyNew();
+  else if (act === "study-open") studyOpen(b.getAttribute("data-id"));
+  else if (act === "study-copy") studyCopy(b.getAttribute("data-id"));
+  else if (act === "study-del") studyDelete(b.getAttribute("data-id"));
+  else if (act === "study-csv") studyCsv();
+  else if (act === "bulk-del") delSelected();
   else if (act === "demo"){ state.records = demoRecords(); save(); render(); toast("تمت تعبئة بيانات تجريبية لثلاثة أشهر"); }
   else if (act === "csv") exportCsv();
   else if (act === "export-json"){
@@ -1383,10 +2038,23 @@ document.addEventListener("input", function(e){
     refreshDynamic();
   }
   var fk = t.getAttribute && t.getAttribute("data-filter");
-  if (fk){ state.filters[fk] = t.value; rerenderKeepFocus('[data-filter="'+fk+'"]'); }
+  if (fk){
+    state.filters[fk] = t.value; state.page = 1;
+    if (fk === "from" || fk === "to") state.quick = "";
+    rerenderKeepFocus('[data-filter="'+fk+'"]');
+  }
   if (t.getAttribute && t.getAttribute("data-cq")){ state.cq = t.value; rerenderKeepFocus('[data-cq="1"]'); }
+  var sf = t.getAttribute && t.getAttribute("data-sf");
+  if (sf){ state.study[sf] = t.value; refreshStudyResult(); }
 });
-document.addEventListener("change", function(e){ if (e.target.closest("#form")) refreshDynamic(); });
+document.addEventListener("change", function(e){
+  if (e.target.closest("#form")) refreshDynamic();
+  var sfc = e.target.getAttribute && e.target.getAttribute("data-sf");
+  if (sfc){ state.study[sfc] = e.target.value; refreshStudyResult(); }
+  if (e.target.getAttribute && e.target.getAttribute("data-per")){
+    state.per = parseInt(e.target.value,10) || 25; state.page = 1; render();
+  }
+});
 
 var rtimer = null;
 function rerenderKeepFocus(sel){
@@ -1401,7 +2069,14 @@ function rerenderKeepFocus(sel){
 }
 document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeModal(); });
 
-load(function(){ render(); });
+/* تحديث لوحة النتيجة وحدها أثناء الكتابة — دون إعادة بناء النموذج */
+function refreshStudyResult(){
+  var host = document.querySelector(".sgrid > div:last-child");
+  if (host) host.innerHTML = studyResultHTML();
+}
+
+state.study = blankStudy();
+load(function(){ loadStudies(function(){ render(); }); });
 </script>
 </body>
 </html>
